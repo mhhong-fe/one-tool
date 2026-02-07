@@ -339,6 +339,7 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
         </div>
         <div class="year-chart">
           <div v-for="(item, i) in yearStats" :key="i" class="year-bar-wrap">
+            <span v-if="item.score > 0" class="year-score">{{ item.score.toFixed(1) }}</span>
             <div
               class="year-bar"
               :style="{
@@ -650,6 +651,13 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
   border-radius: 6px 6px 0 0;
 }
 
+.year-score {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
 .year-label {
   font-size: 11px;
   color: var(--text-tertiary);
@@ -669,6 +677,9 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .progress-bar-wrap {
