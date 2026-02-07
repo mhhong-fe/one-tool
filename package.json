@@ -1,0 +1,22 @@
+{
+  "name": "one-tool",
+  "private": true,
+  "packageManager": "pnpm@9.14.2",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.19",
+    "naive-ui": "^2.38.1",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "vite": "^5.2.0"
+  }
+}

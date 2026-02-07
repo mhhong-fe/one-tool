@@ -1,0 +1,59 @@
+/* ========== C 端风格变量 ========== */
+:root {
+  /* 主色（活力绿） */
+  --primary-color: #22c55e;
+  --primary-light: #4ade80;
+  --primary-dark: #16a34a;
+  --primary-gradient: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+  --primary-soft: rgba(34, 197, 94, 0.12);
+
+  /* 类目色 */
+  --category-1: #3b82f6;
+  --category-2: #f59e0b;
+  --category-3: #ec4899;
+  --category-4: #8b5cf6;
+  --category-5: #10b981;
+
+  /* 场景色 */
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --info-color: #3b82f6;
+
+  /* 中性色（偏暖） */
+  --text-primary: #1a1a1a;
+  --text-secondary: #525252;
+  --text-tertiary: #a3a3a3;
+  --bg-primary: #ffffff;
+  --bg-page: #fafaf9;
+  --bg-card: #ffffff;
+  --bg-soft: #f5f5f4;
+  --border-color: #e7e5e4;
+  --border-soft: #f5f5f4;
+
+  /* 圆角 */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+
+  /* 阴影（更柔和） */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.1);
+
+  /* 贡献图格子颜色（LeetCode 风格） */
+  --cell-empty: #ebedf0;
+  --cell-level-1: #9be9a8;
+  --cell-level-2: #40c463;
+  --cell-level-3: #30a14e;
+  --cell-level-4: #216e39;
+
+  /* 兼容旧变量 */
+  --card-shadow: var(--shadow-md);
+  --card-hover-shadow: var(--shadow-lg);
+  --bg-secondary: var(--bg-soft);
+  --bg-tertiary: var(--bg-soft);
+  --sidebar-bg: linear-gradient(180deg, #fafaf9 0%, #f5f5f4 100%);
+}
