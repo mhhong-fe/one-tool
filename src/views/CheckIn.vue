@@ -16,7 +16,10 @@ const detail = ref('')
 const todayStr = computed(() => getTodayStr())
 
 const categoryOptions = computed(() =>
-  categories.value.map((c) => ({ label: c.name, value: c.id }))
+  categories.value.map((c) => ({
+    label: `${getIcon(c.icon || 'ActivitySource')} ${c.name}`,
+    value: c.id,
+  }))
 )
 
 const selectedCategory = computed(() =>

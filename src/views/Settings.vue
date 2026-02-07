@@ -17,7 +17,7 @@ import { useCategories } from '../composables/useCategories'
 import { useRecords } from '../composables/useRecords'
 import { storage } from '../utils/storage'
 import { dayjs } from '../utils/date'
-import { getIcon } from '../components/icons'
+import { getIcon, categoryIcons } from '../components/icons'
 
 const message = useMessage()
 const dialog = useDialog()
@@ -28,11 +28,13 @@ const newName = ref('')
 const newDetailLabel = ref('详情')
 const newDetailType = ref('text')
 const newUnitsPerScore = ref(1)
+const newIcon = ref('ActivitySource')
 const editingId = ref(null)
 const editingName = ref('')
 const editingDetailLabel = ref('')
 const editingDetailType = ref('text')
 const editingUnitsPerScore = ref(1)
+const editingIcon = ref('ActivitySource')
 
 onMounted(() => {
   loadCategories()
@@ -46,12 +48,13 @@ function handleAddCategory() {
     return
   }
   const unitsPerScore = newDetailType.value === 'number' ? Math.max(0.01, Number(newUnitsPerScore.value) || 1) : 1
-  add(name, newDetailLabel.value || '详情', newDetailType.value, 'ActivitySource', 'category-custom', unitsPerScore)
+  add(name, newDetailLabel.value || '详情', newDetailType.value, newIcon.value, 'category-custom', unitsPerScore)
   message.success('添加成功')
   newName.value = ''
   newDetailLabel.value = '详情'
   newDetailType.value = 'text'
   newUnitsPerScore.value = 1
+  newIcon.value = 'ActivitySource'
 }
 
 function startEdit(c) {
@@ -60,6 +63,7 @@ function startEdit(c) {
   editingDetailLabel.value = c.detailLabel || '详情'
   editingDetailType.value = c.detailType || 'text'
   editingUnitsPerScore.value = c.unitsPerScore ?? 1
+  editingIcon.value = c.icon || 'ActivitySource'
 }
 
 function saveEdit() {
@@ -75,6 +79,7 @@ function saveEdit() {
     detailLabel: editingDetailLabel.value || '详情',
     detailType: editingDetailType.value || 'text',
     unitsPerScore,
+    icon: editingIcon.value,
   })
   message.success('已保存')
   editingId.value = null
@@ -179,6 +184,21 @@ function handleClearData() {
           />
           <span class="form-hint">每 {{ newUnitsPerScore || 1 }} {{ newDetailLabel || '单位' }} = 1 分</span>
         </NFormItem>
+        <NFormItem label="图标">
+          <div class="icon-picker">
+            <button
+              v-for="opt in categoryIcons"
+              :key="opt.key"
+              type="button"
+              class="icon-option"
+              :class="{ active: newIcon === opt.key }"
+              :title="opt.label"
+              @click="newIcon = opt.key"
+            >
+              {{ opt.emoji }}
+            </button>
+          </div>
+        </NFormItem>
         <NButton type="primary" @click="handleAddCategory">
           <span class="btn-with-icon">{{ getIcon('Add') }} 添加类目</span>
         </NButton>
@@ -187,6 +207,19 @@ function handleClearData() {
       <ul class="category-list">
         <li v-for="c in categories" :key="c.id" class="category-item">
           <template v-if="editingId === c.id">
+            <div class="icon-picker inline">
+              <button
+                v-for="opt in categoryIcons"
+                :key="opt.key"
+                type="button"
+                class="icon-option small"
+                :class="{ active: editingIcon === opt.key }"
+                :title="opt.label"
+                @click="editingIcon = opt.key"
+              >
+                {{ opt.emoji }}
+              </button>
+            </div>
             <NInput v-model:value="editingName" size="small" placeholder="名称" />
             <NInput v-model:value="editingDetailLabel" size="small" placeholder="详情标签" />
             <NRadioGroup v-model:value="editingDetailType" size="small">
@@ -206,7 +239,7 @@ function handleClearData() {
             <NButton size="small" secondary @click="cancelEdit">取消</NButton>
           </template>
           <template v-else>
-            <span v-if="c.icon" class="cat-icon">{{ getIcon(c.icon) }}</span>
+            <span class="cat-icon">{{ getIcon(c.icon || 'ActivitySource') }}</span>
             <span class="cat-name">{{ c.name }}</span>
             <span class="cat-meta">
               {{ c.detailLabel }} ({{ c.detailType === 'number' ? '数字' : '文本' }})
@@ -355,6 +388,44 @@ function handleClearData() {
 
 .input-units {
   width: 90px;
+}
+
+.icon-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.icon-picker.inline {
+  flex-shrink: 0;
+}
+
+.icon-option {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.icon-option:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-soft);
+}
+
+.icon-option.active {
+  border-color: var(--primary-color);
+  background: var(--primary-soft);
+}
+
+.icon-option.small {
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
 }
 
 .hidden-input {
