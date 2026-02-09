@@ -33,6 +33,16 @@ body::before {
   z-index: 0;
 }
 
+/* iconfont 图标通用样式 */
+.iconfont-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+  display: inline-block;
+}
+
 /* H5 触控优化 */
 @media (max-width: 767px) {
   .n-button,

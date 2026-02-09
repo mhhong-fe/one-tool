@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, h } from 'vue'
 import {
   NCard,
@@ -20,7 +20,7 @@ import { useCategories } from '../composables/useCategories'
 import { useRecords } from '../composables/useRecords'
 import { dayjs } from '../utils/date'
 import { recordScore } from '../utils/score'
-import { getIcon } from '../components/icons'
+import IconFont from '../components/IconFont.vue'
 
 const message = useMessage()
 const dialog = useDialog()
@@ -28,14 +28,14 @@ const { list: categoriesList } = useCategories()
 const { list: records, update: updateRecord, remove: removeRecord } = useRecords()
 
 const showEditModal = ref(false)
-const editRecordRow = ref(null)
+const editRecordRow = ref<any>(null)
 const editRecordDetail = ref('')
 const selectedDateStr = ref('')
 const showDayDetail = ref(false)
 
-const timeView = ref('grid') // grid | year
-const viewMode = ref('detail') // detail | overview
-const selectedCategories = ref([])
+const timeView = ref<'grid' | 'year'>('grid')
+const viewMode = ref<'detail' | 'overview'>('detail')
+const selectedCategories = ref<string[]>([])
 const displayYear = ref(dayjs().year())
 
 const filteredRecords = computed(() => {
@@ -59,7 +59,7 @@ const recordScoreByDate = computed(() => {
 })
 
 /** 按日期获取打卡记录 */
-function getRecordsByDate(dateStr) {
+function getRecordsByDate(dateStr: string) {
   return filteredRecords.value.filter((r) => r.date === dateStr)
 }
 
@@ -114,7 +114,7 @@ const contributionByMonth = computed(() => {
 })
 
 /** 根据分数返回颜色等级 0-4：0分 | 1～3 | 3～6 | 6～10 | 10+ */
-function getLevel(score) {
+function getLevel(score: number): number {
   if (score <= 0) return 0
   if (score < 3) return 1
   if (score < 6) return 2
@@ -137,7 +137,7 @@ const legendLevels = [
   { color: levelColors[4], label: '10+分' },
 ]
 
-function getCellBg(score, isFuture) {
+function getCellBg(score: number, isFuture: boolean): string {
   if (isFuture) return 'var(--cell-empty)'
   return levelColors[getLevel(score)]
 }
@@ -160,41 +160,41 @@ const selectedDayTotalScore = computed(() =>
   selectedDayRecords.value.reduce((sum, r) => sum + (r.score || 0), 0)
 )
 
-const detailLabelToUnit = { 公里数: '公里', 刷题数: '题', 页数: '页' }
-function getDetailWithUnit(row) {
+const detailLabelToUnit: Record<string, string> = { 公里数: '公里', 刷题数: '题', 页数: '页' }
+function getDetailWithUnit(row: any): string {
   if (row.detail == null || row.detail === '') return '-'
   if (row.detailType !== 'number') return row.detail
   const unit = detailLabelToUnit[row.detailLabel] || row.detailLabel || ''
   return unit ? `${row.detail} ${unit}` : row.detail
 }
 
-function openDayDetail(dateStr) {
+function openDayDetail(dateStr: string): void {
   selectedDateStr.value = dateStr
   showDayDetail.value = true
 }
 
-function handleEditRecord(row) {
+function handleEditRecord(row: any): void {
   editRecordRow.value = row
   editRecordDetail.value = row.detail || ''
   showEditModal.value = true
 }
 
-function saveEditRecord() {
+async function saveEditRecord(): Promise<void> {
   if (!editRecordRow.value) return
-  updateRecord(editRecordRow.value.id, { detail: editRecordDetail.value })
+  await updateRecord(editRecordRow.value.id, { detail: editRecordDetail.value })
   message.success('已更新')
   showEditModal.value = false
   editRecordRow.value = null
 }
 
-function handleDeleteRecord(row) {
+function handleDeleteRecord(row: any): void {
   dialog.warning({
     title: '确认删除',
     content: '确定删除这条打卡记录？',
     positiveText: '删除',
     negativeText: '取消',
-    onPositiveClick: () => {
-      removeRecord(row.id)
+    onPositiveClick: async () => {
+      await removeRecord(row.id)
       message.success('已删除')
     },
   })
@@ -260,7 +260,7 @@ const overviewStats = computed(() => {
 
 const categoryColors = ['var(--category-1)', 'var(--category-2)', 'var(--category-3)', 'var(--category-4)', 'var(--category-5)']
 
-function getCategoryColor(index) {
+function getCategoryColor(index: number): string {
   return categoryColors[index % categoryColors.length]
 }
 
@@ -270,9 +270,15 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
 <template>
   <div class="page-stats">
     <header class="page-header">
-      <span class="title-icon">{{ getIcon('ChartLine') }}</span>
-      <h1 class="page-title">数据统计</h1>
-      <p class="page-desc">查看你的打卡记录与趋势</p>
+      <div class="header-content">
+        <div class="header-icon-wrapper">
+          <IconFont name="ChartLine" class="title-icon" :size="48" />
+        </div>
+        <div class="header-text">
+          <h1 class="page-title">数据统计</h1>
+          <p class="page-desc">查看你的打卡记录与趋势</p>
+        </div>
+      </div>
     </header>
 
     <div class="toolbar">
@@ -281,7 +287,7 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
         <NTabPane name="year" tab="年度趋势" />
       </NTabs>
       <div class="filter-row">
-        <span class="filter-icon">{{ getIcon('Filter') }}</span>
+        <IconFont name="Filter" class="filter-icon" :size="18" />
         <span class="filter-label">类目：</span>
         <NCheckboxGroup v-model:value="selectedCategories">
           <NCheckbox v-for="c in categoriesList" :key="c.id" :value="c.id" :label="c.name" />
@@ -393,27 +399,57 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
 }
 
 .page-header {
-  margin-bottom: 28px;
+  margin-bottom: 40px;
+  position: relative;
 }
 
-.page-header .title-icon {
-  display: inline-block;
-  font-size: 32px;
-  margin-bottom: 8px;
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(34, 197, 94, 0.05) 100%);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  box-shadow: var(--shadow-sm);
+}
+
+.header-icon-wrapper {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #3b82f6 0%, #22c55e 100%);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.title-icon {
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.header-text {
+  flex: 1;
 }
 
 .page-title {
-  margin: 0 0 6px;
-  font-size: 26px;
+  margin: 0 0 8px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
 .page-desc {
   margin: 0;
-  font-size: 14px;
-  color: var(--text-tertiary);
+  font-size: 15px;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .toolbar {
@@ -435,7 +471,7 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
 }
 
 .filter-icon {
-  font-size: 18px;
+  color: var(--text-secondary);
 }
 
 .filter-label {

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { NProgress, NTag } from 'naive-ui'
 import { useRouter } from 'vue-router'
@@ -6,7 +6,7 @@ import { useCategories } from '../composables/useCategories'
 import { useRecords } from '../composables/useRecords'
 import { recordScore } from '../utils/score'
 import { dayjs, todayStr as getTodayStr, weekStart as getWeekStart } from '../utils/date'
-import { getIcon } from '../components/icons'
+import IconFont from '../components/IconFont.vue'
 
 const router = useRouter()
 const { list: categories } = useCategories()
@@ -69,8 +69,17 @@ const greeting = computed(() => {
 <template>
   <div class="page-home">
     <header class="page-header">
-      <p class="greeting">{{ greeting }}，今天也要加油 ✨</p>
-      <h1 class="page-title">今日打卡</h1>
+      <div class="header-content">
+        <div class="header-text">
+          <p class="greeting">{{ greeting }}，今天也要加油 ✨</p>
+          <h1 class="page-title">今日打卡</h1>
+        </div>
+        <div class="header-decoration">
+          <div class="decoration-circle circle-1"></div>
+          <div class="decoration-circle circle-2"></div>
+          <div class="decoration-circle circle-3"></div>
+        </div>
+      </div>
     </header>
 
     <!-- 完成度卡片 -->
@@ -118,7 +127,7 @@ const greeting = computed(() => {
           class="tag-remind"
           @click="router.push('/checkin')"
         >
-          <span v-if="c.icon" class="tag-icon">{{ getIcon(c.icon) }}</span>
+          <IconFont v-if="c.icon" :name="c.icon" class="tag-icon" :size="16" />
           {{ c.name }}
         </NTag>
       </div>
@@ -138,7 +147,7 @@ const greeting = computed(() => {
           class="record-item"
         >
           <span class="record-cat">
-            <span v-if="categories.find(c => c.id === r.categoryId)?.icon" class="record-icon">{{ getIcon(categories.find(c => c.id === r.categoryId)?.icon) }}</span>
+            <IconFont v-if="categories.find(c => c.id === r.categoryId)?.icon" :name="categories.find(c => c.id === r.categoryId)?.icon || 'ActivitySource'" class="record-icon" :size="20" />
             {{ categories.find(c => c.id === r.categoryId)?.name || '-' }}
           </span>
           <span class="record-detail">{{ r.detail || '-' }}</span>
@@ -154,21 +163,106 @@ const greeting = computed(() => {
 }
 
 .page-header {
-  margin-bottom: 32px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-content {
+  position: relative;
+  padding: 32px 28px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(59, 130, 246, 0.05) 100%);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(34, 197, 94, 0.1);
+  box-shadow: var(--shadow-sm);
+}
+
+.header-text {
+  position: relative;
+  z-index: 2;
 }
 
 .greeting {
-  margin: 0 0 8px;
-  font-size: 15px;
-  color: var(--text-tertiary);
+  margin: 0 0 12px;
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.greeting::before {
+  content: '✨';
+  font-size: 18px;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.1); }
 }
 
 .page-title {
   margin: 0;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
-  color: var(--text-primary);
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.header-decoration {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  pointer-events: none;
+}
+
+.decoration-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, transparent 70%);
+  animation: float 6s ease-in-out infinite;
+}
+
+.circle-1 {
+  width: 120px;
+  height: 120px;
+  top: -40px;
+  right: -20px;
+  animation-delay: 0s;
+}
+
+.circle-2 {
+  width: 80px;
+  height: 80px;
+  bottom: -20px;
+  right: 40px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+  animation-delay: 2s;
+}
+
+.circle-3 {
+  width: 60px;
+  height: 60px;
+  top: 50%;
+  left: -10px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+  animation-delay: 4s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  50% { transform: translate(10px, -10px) scale(1.1); opacity: 0.8; }
 }
 
 .section-progress {
@@ -277,7 +371,7 @@ const greeting = computed(() => {
 }
 
 .tag-icon {
-  font-size: 16px;
+  color: var(--warning-color);
 }
 
 .record-list {
@@ -314,7 +408,7 @@ const greeting = computed(() => {
 }
 
 .record-icon {
-  font-size: 20px;
+  color: var(--primary-color);
 }
 
 .record-detail {

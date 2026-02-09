@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { NConfigProvider, NMessageProvider, NDialogProvider } from 'naive-ui'
 import AppLayout from './components/AppLayout.vue'
 

@@ -1,9 +1,11 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, type Ref, type ComputedRef } from 'vue'
 
 /* sm <768 H5 | md 768-1000 平板 | lg ≥1000 PC */
 const WIDTH = { sm: 768, md: 1000 }
 
-function getBreakpoint() {
+type Breakpoint = 'sm' | 'md' | 'lg'
+
+function getBreakpoint(): Breakpoint {
   if (typeof window === 'undefined') return 'lg'
   const w = window.innerWidth
   if (w < WIDTH.sm) return 'sm'
@@ -11,10 +13,10 @@ function getBreakpoint() {
   return 'lg'
 }
 
-const current = ref('lg')
+const current: Ref<Breakpoint> = ref('lg')
 
 export function useBreakpoint() {
-  function update() {
+  function update(): void {
     current.value = getBreakpoint()
   }
 
@@ -29,9 +31,9 @@ export function useBreakpoint() {
 
   return {
     breakpoint: current,
-    isMobile: computed(() => current.value === 'sm'),
-    isTablet: computed(() => current.value === 'md'),
-    isDesktop: computed(() => current.value === 'lg'),
+    isMobile: computed(() => current.value === 'sm') as ComputedRef<boolean>,
+    isTablet: computed(() => current.value === 'md') as ComputedRef<boolean>,
+    isDesktop: computed(() => current.value === 'lg') as ComputedRef<boolean>,
     update,
   }
 }

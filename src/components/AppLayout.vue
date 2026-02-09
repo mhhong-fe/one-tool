@@ -1,22 +1,22 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue'
 import { NLayout, NLayoutSider, NLayoutContent } from 'naive-ui'
 import { useRoute, useRouter } from 'vue-router'
 import { useBreakpoint } from '../composables/useBreakpoint'
-import { getIcon } from './icons'
+import IconFont from './IconFont.vue'
 
 const route = useRoute()
 const router = useRouter()
 const { isDesktop } = useBreakpoint()
 
 const menuOptions = [
-  { label: '总览', key: '/', icon: getIcon('Dashboard') },
-  { label: '打卡', key: '/checkin', icon: getIcon('Write') },
-  { label: '统计', key: '/stats', icon: getIcon('ChartLine') },
-  { label: '设置', key: '/settings', icon: getIcon('Setting') },
+  { label: '总览', key: '/', icon: 'Dashboard' },
+  { label: '打卡', key: '/checkin', icon: 'Write' },
+  { label: '统计', key: '/stats', icon: 'ChartLine' },
+  { label: '设置', key: '/settings', icon: 'Setting' },
 ]
 
-function handleMenuSelect(key) {
+function handleMenuSelect(key: string): void {
   router.push(key)
 }
 
@@ -47,7 +47,7 @@ const activeKey = computed(() => route.path || '/')
           :class="{ active: activeKey === opt.key }"
           @click.prevent="handleMenuSelect(opt.key)"
         >
-          <span class="nav-icon">{{ opt.icon }}</span>
+          <IconFont :name="opt.icon" class="nav-icon" :size="22" />
           <span class="nav-label">{{ opt.label }}</span>
         </a>
       </nav>
@@ -77,7 +77,7 @@ const activeKey = computed(() => route.path || '/')
           :class="{ active: activeKey === opt.key }"
           @click="handleMenuSelect(opt.key)"
         >
-          <span class="tab-icon">{{ opt.icon }}</span>
+          <IconFont :name="opt.icon" class="tab-icon" :size="24" />
           <span class="tab-label">{{ opt.label }}</span>
         </button>
       </nav>
@@ -154,9 +154,8 @@ const activeKey = computed(() => route.path || '/')
 
 .nav-icon {
   flex-shrink: 0;
-  font-size: 22px;
-  line-height: 1;
   transition: transform 0.2s;
+  color: inherit;
 }
 
 .nav-label {
@@ -245,8 +244,8 @@ const activeKey = computed(() => route.path || '/')
 
 .tab-icon {
   flex-shrink: 0;
-  font-size: 24px;
-  line-height: 1;
+  color: inherit;
+  transition: color 0.2s;
 }
 
 .fade-enter-active,

@@ -6,9 +6,13 @@ import './assets/styles/global.css'
 import { initCategories } from './composables/useCategories'
 import { initRecords } from './composables/useRecords'
 
-initCategories()
-initRecords()
+// 异步初始化数据
+async function initApp(): Promise<void> {
+  await Promise.all([initCategories(), initRecords()])
+  
+  const app = createApp(App)
+  app.use(router)
+  app.mount('#app')
+}
 
-const app = createApp(App)
-app.use(router)
-app.mount('#app')
+initApp()

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import {
   NCard,
@@ -17,7 +17,8 @@ import { useCategories } from '../composables/useCategories'
 import { useRecords } from '../composables/useRecords'
 import { storage } from '../utils/storage'
 import { dayjs } from '../utils/date'
-import { getIcon, categoryIcons } from '../components/icons'
+import IconFont from '../components/IconFont.vue'
+import { categoryIcons } from '../components/icons'
 
 const message = useMessage()
 const dialog = useDialog()
@@ -36,19 +37,19 @@ const editingDetailType = ref('text')
 const editingUnitsPerScore = ref(1)
 const editingIcon = ref('ActivitySource')
 
-onMounted(() => {
-  loadCategories()
-  loadRecords()
+onMounted(async () => {
+  await loadCategories()
+  await loadRecords()
 })
 
-function handleAddCategory() {
+async function handleAddCategory(): Promise<void> {
   const name = newName.value.trim()
   if (!name) {
     message.warning('请输入类目名称')
     return
   }
   const unitsPerScore = newDetailType.value === 'number' ? Math.max(0.01, Number(newUnitsPerScore.value) || 1) : 1
-  add(name, newDetailLabel.value || '详情', newDetailType.value, newIcon.value, 'category-custom', unitsPerScore)
+  await add(name, newDetailLabel.value || '详情', newDetailType.value, newIcon.value, 'category-custom', unitsPerScore)
   message.success('添加成功')
   newName.value = ''
   newDetailLabel.value = '详情'
@@ -57,7 +58,7 @@ function handleAddCategory() {
   newIcon.value = 'ActivitySource'
 }
 
-function startEdit(c) {
+function startEdit(c: any): void {
   editingId.value = c.id
   editingName.value = c.name
   editingDetailLabel.value = c.detailLabel || '详情'
@@ -66,7 +67,7 @@ function startEdit(c) {
   editingIcon.value = c.icon || 'ActivitySource'
 }
 
-function saveEdit() {
+async function saveEdit(): Promise<void> {
   if (!editingId.value) return
   const name = editingName.value.trim()
   if (!name) {
@@ -74,7 +75,7 @@ function saveEdit() {
     return
   }
   const unitsPerScore = editingDetailType.value === 'number' ? Math.max(0.01, Number(editingUnitsPerScore.value) || 1) : 1
-  update(editingId.value, {
+  await update(editingId.value, {
     name,
     detailLabel: editingDetailLabel.value || '详情',
     detailType: editingDetailType.value || 'text',
@@ -85,22 +86,22 @@ function saveEdit() {
   editingId.value = null
 }
 
-function cancelEdit() {
+function cancelEdit(): void {
   editingId.value = null
 }
 
-function handleDelete(c) {
+async function handleDelete(c: any): Promise<void> {
   const records = getByCategoryId(c.id)
   if (records.length > 0) {
     message.warning(`该类目下已有 ${records.length} 条打卡记录，无法删除。请先删除相关记录。`)
     return
   }
-  remove(c.id)
+  await remove(c.id)
   message.success('已删除')
 }
 
-function handleExport() {
-  const json = storage.exportAll()
+async function handleExport(): Promise<void> {
+  const json = await storage.exportAll()
   const blob = new Blob([json], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
@@ -111,21 +112,21 @@ function handleExport() {
   message.success('备份已下载')
 }
 
-const fileInput = ref(null)
+const fileInput = ref<HTMLInputElement | null>(null)
 
-function handleImportClick() {
+function handleImportClick(): void {
   fileInput.value?.click()
 }
 
-function handleFileChange(e) {
-  const file = e.target.files?.[0]
+async function handleFileChange(e: Event): Promise<void> {
+  const file = (e.target as HTMLInputElement).files?.[0]
   if (!file) return
   const reader = new FileReader()
-  reader.onload = () => {
-    const result = storage.importFrom(reader.result)
+  reader.onload = async () => {
+    const result = await storage.importFrom(reader.result as string)
     if (result.success) {
-      loadCategories()
-      loadRecords()
+      await loadCategories()
+      await loadRecords()
       message.success('导入成功')
     } else {
       message.error('导入失败：' + (result.error || '无效的 JSON'))
@@ -135,16 +136,16 @@ function handleFileChange(e) {
   e.target.value = ''
 }
 
-function handleClearData() {
+function handleClearData(): void {
   dialog.warning({
     title: '确认清空',
     content: '将清空所有打卡类目与打卡记录，且无法恢复。确定继续？',
     positiveText: '确定清空',
     negativeText: '取消',
-    onPositiveClick: () => {
-      storage.clear()
-      loadCategories()
-      loadRecords()
+    onPositiveClick: async () => {
+      await storage.clear()
+      await loadCategories()
+      await loadRecords()
       message.success('已清空')
     },
   })
@@ -154,9 +155,15 @@ function handleClearData() {
 <template>
   <div class="page-settings">
     <header class="page-header">
-      <span class="title-icon">{{ getIcon('Setting') }}</span>
-      <h1 class="page-title">设置</h1>
-      <p class="page-desc">管理类目与数据</p>
+      <div class="header-content">
+        <div class="header-icon-wrapper">
+          <IconFont name="Setting" class="title-icon" :size="48" />
+        </div>
+        <div class="header-text">
+          <h1 class="page-title">设置</h1>
+          <p class="page-desc">管理类目与数据</p>
+        </div>
+      </div>
     </header>
 
     <!-- 类目管理 -->
@@ -200,7 +207,10 @@ function handleClearData() {
           </div>
         </NFormItem>
         <NButton type="primary" @click="handleAddCategory">
-          <span class="btn-with-icon">{{ getIcon('Add') }} 添加类目</span>
+          <span class="btn-with-icon">
+            <IconFont name="Add" :size="16" style="margin-right: 4px;" />
+            添加类目
+          </span>
         </NButton>
       </NForm>
 
@@ -239,7 +249,7 @@ function handleClearData() {
             <NButton size="small" secondary @click="cancelEdit">取消</NButton>
           </template>
           <template v-else>
-            <span class="cat-icon">{{ getIcon(c.icon || 'ActivitySource') }}</span>
+            <IconFont :name="c.icon || 'ActivitySource'" class="cat-icon" :size="22" />
             <span class="cat-name">{{ c.name }}</span>
             <span class="cat-meta">
               {{ c.detailLabel }} ({{ c.detailType === 'number' ? '数字' : '文本' }})
@@ -248,12 +258,18 @@ function handleClearData() {
               </template>
             </span>
             <NButton size="small" secondary @click="startEdit(c)">
-              <span class="btn-with-icon">{{ getIcon('Edit') }} 编辑</span>
+              <span class="btn-with-icon">
+                <IconFont name="Edit" :size="14" style="margin-right: 4px;" />
+                编辑
+              </span>
             </NButton>
             <NPopconfirm @positive-click="handleDelete(c)">
               <template #trigger>
                 <NButton size="small" type="error" tertiary>
-                  <span class="btn-with-icon">{{ getIcon('Delete') }} 删除</span>
+                  <span class="btn-with-icon">
+                    <IconFont name="Delete" :size="14" style="margin-right: 4px;" />
+                    删除
+                  </span>
                 </NButton>
               </template>
               确定删除该类目？
@@ -274,7 +290,10 @@ function handleClearData() {
       />
       <NSpace>
         <NButton @click="handleExport">
-          <span class="btn-with-icon">{{ getIcon('Download') }} 导出备份 (JSON)</span>
+          <span class="btn-with-icon">
+            <IconFont name="Download" :size="16" style="margin-right: 4px;" />
+            导出备份 (JSON)
+          </span>
         </NButton>
         <NButton @click="handleImportClick">导入备份</NButton>
         <NButton type="error" tertiary @click="handleClearData">清空全部数据</NButton>
@@ -290,27 +309,57 @@ function handleClearData() {
 }
 
 .page-header {
-  margin-bottom: 32px;
+  margin-bottom: 40px;
+  position: relative;
 }
 
-.page-header .title-icon {
-  display: inline-block;
-  font-size: 32px;
-  margin-bottom: 8px;
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(59, 130, 246, 0.05) 100%);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+  box-shadow: var(--shadow-sm);
+}
+
+.header-icon-wrapper {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
+}
+
+.title-icon {
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.header-text {
+  flex: 1;
 }
 
 .page-title {
-  margin: 0 0 6px;
-  font-size: 26px;
+  margin: 0 0 8px;
+  font-size: 28px;
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
 .page-desc {
   margin: 0;
-  font-size: 14px;
-  color: var(--text-tertiary);
+  font-size: 15px;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .card.section-card {
@@ -358,8 +407,8 @@ function handleClearData() {
 }
 
 .cat-icon {
-  font-size: 22px;
   flex-shrink: 0;
+  color: var(--primary-color);
 }
 
 .cat-name {

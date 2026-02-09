@@ -1,24 +1,26 @@
-<script setup>
-import { ref, computed } from 'vue'
-import { NForm, NFormItem, NSelect, NInput, NButton, useMessage } from 'naive-ui'
+<script setup lang="ts">
+import { ref, computed, h, watch } from 'vue'
+import { NForm, NFormItem, NSelect, NInput, NInputNumber, NButton, useMessage } from 'naive-ui'
 import { useCategories } from '../composables/useCategories'
 import { useRecords } from '../composables/useRecords'
 import { todayStr as getTodayStr } from '../utils/date'
-import { getIcon } from '../components/icons'
+import IconFont from '../components/IconFont.vue'
 
 const message = useMessage()
 const { list: categories } = useCategories()
 const { add: addRecord } = useRecords()
 
-const categoryId = ref(null)
-const detail = ref('')
+const categoryId = ref<string | null>(null)
+const detail = ref<string>('')
+const detailNumber = ref<number | null>(null)
 
 const todayStr = computed(() => getTodayStr())
 
 const categoryOptions = computed(() =>
   categories.value.map((c) => ({
-    label: `${getIcon(c.icon || 'ActivitySource')} ${c.name}`,
+    label: c.name,
     value: c.id,
+    icon: c.icon || 'ActivitySource',
   }))
 )
 
@@ -29,44 +31,67 @@ const selectedCategory = computed(() =>
 const detailLabel = computed(() => selectedCategory.value?.detailLabel || '详情')
 const detailType = computed(() => selectedCategory.value?.detailType || 'text')
 
-function handleSubmit() {
+// 监听分类变化，重置详情输入
+watch(categoryId, () => {
+  detail.value = ''
+  detailNumber.value = null
+})
+
+async function handleSubmit(): Promise<void> {
   if (!categoryId.value) {
     message.warning('请选择打卡类目')
     return
   }
   const cat = selectedCategory.value
+  let detailValue: string
+  
   if (cat?.detailType === 'number') {
-    const n = Number(detail.value)
-    if (detail.value === '' || detail.value == null) {
+    if (detailNumber.value === null || detailNumber.value === undefined) {
       message.warning('请填写' + (cat.detailLabel || '详情'))
       return
     }
-    if (Number.isNaN(n) || n < 0) {
+    if (detailNumber.value < 0) {
       message.warning('请输入非负数字')
       return
     }
+    detailValue = String(detailNumber.value)
+  } else {
+    detailValue = String(detail.value || '').trim()
+    if (!detailValue) {
+      message.warning('请填写' + (cat?.detailLabel || '详情'))
+      return
+    }
   }
-  addRecord({
-    categoryId: categoryId.value,
+  
+  await addRecord({
+    categoryId: categoryId.value!,
     date: todayStr.value,
-    detail: String(detail.value).trim(),
+    detail: detailValue,
   })
   message.success('打卡成功')
   detail.value = ''
+  detailNumber.value = null
 }
 
-function handleClear() {
+function handleClear(): void {
   categoryId.value = null
   detail.value = ''
+  detailNumber.value = null
 }
 </script>
 
 <template>
   <div class="page-checkin">
     <header class="page-header">
-      <span class="title-icon">{{ getIcon('Write') }}</span>
-      <h1 class="page-title">打卡</h1>
-      <p class="page-desc">记录今天的努力</p>
+      <div class="header-content">
+        <div class="header-icon-wrapper">
+          <IconFont name="Write" class="title-icon" :size="48" />
+        </div>
+        <div class="header-text">
+          <h1 class="page-title">打卡</h1>
+          <p class="page-desc">记录今天的努力</p>
+        </div>
+      </div>
     </header>
 
     <div class="form-card">
@@ -78,12 +103,34 @@ function handleClear() {
             placeholder="请选择要打卡的类目"
             clearable
             size="large"
+            :render-label="(option: any) => {
+              return h('div', { style: 'display: flex; align-items: center; gap: 8px;' }, [
+                h(IconFont, { name: option.icon, size: 18 }),
+                h('span', option.label)
+              ])
+            }"
+            :render-option="(option: any) => {
+              return h('div', { style: 'display: flex; align-items: center; gap: 8px;' }, [
+                h(IconFont, { name: option.icon, size: 18 }),
+                h('span', option.label)
+              ])
+            }"
           />
         </NFormItem>
         <NFormItem :label="detailLabel" :required="detailType === 'number'">
+          <NInputNumber
+            v-if="detailType === 'number'"
+            v-model:value="detailNumber"
+            :placeholder="'请输入' + detailLabel"
+            clearable
+            size="large"
+            :min="0"
+            :precision="2"
+            @keyup.enter="handleSubmit"
+          />
           <NInput
+            v-else
             v-model:value="detail"
-            :type="detailType === 'number' ? 'number' : 'text'"
             :placeholder="'请输入' + detailLabel"
             clearable
             size="large"
@@ -110,13 +157,41 @@ function handleClear() {
 }
 
 .page-header {
-  margin-bottom: 36px;
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(59, 130, 246, 0.05) 100%);
+  border-radius: var(--radius-xl);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(34, 197, 94, 0.1);
+  box-shadow: var(--shadow-sm);
+}
+
+.header-icon-wrapper {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-gradient);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
 }
 
 .title-icon {
-  display: inline-block;
-  font-size: 36px;
-  margin-bottom: 12px;
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.header-text {
+  flex: 1;
 }
 
 .page-title {
@@ -125,12 +200,14 @@ function handleClear() {
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.5px;
+  line-height: 1.2;
 }
 
 .page-desc {
   margin: 0;
   font-size: 15px;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .form-card {
