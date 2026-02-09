@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, h, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { NForm, NFormItem, NSelect, NInput, NInputNumber, NButton, useMessage } from 'naive-ui'
 import { useCategories } from '../composables/useCategories'
 import { useRecords } from '../composables/useRecords'
@@ -20,7 +20,6 @@ const categoryOptions = computed(() =>
   categories.value.map((c) => ({
     label: c.name,
     value: c.id,
-    icon: c.icon || 'ActivitySource',
   }))
 )
 
@@ -103,18 +102,6 @@ function handleClear(): void {
             placeholder="请选择要打卡的类目"
             clearable
             size="large"
-            :render-label="(option: any) => {
-              return h('div', { style: 'display: flex; align-items: center; gap: 8px;' }, [
-                h(IconFont, { name: option.icon, size: 18 }),
-                h('span', option.label)
-              ])
-            }"
-            :render-option="(option: any) => {
-              return h('div', { style: 'display: flex; align-items: center; gap: 8px;' }, [
-                h(IconFont, { name: option.icon, size: 18 }),
-                h('span', option.label)
-              ])
-            }"
           />
         </NFormItem>
         <NFormItem :label="detailLabel" :required="detailType === 'number'">
@@ -224,7 +211,9 @@ function handleClear(): void {
 }
 
 .form-card :deep(.n-input),
+.form-card :deep(.n-input-number),
 .form-card :deep(.n-base-selection) {
+  width: 100%;
   border-radius: var(--radius-md);
 }
 

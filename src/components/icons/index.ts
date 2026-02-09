@@ -23,6 +23,8 @@ const iconMap: Record<string, string> = {
   CheckOne: 'heroicons:check-circle-solid',
   Info: 'heroicons:information-circle-solid',
   Trophy: 'heroicons:trophy-solid',
+  Calendar: 'heroicons:calendar-days-solid',
+  CheckCircle: 'heroicons:check-circle-solid',
   
   // 类目图标（使用 mdi，图标更丰富）
   RunLeft: 'mdi:run-fast',
@@ -44,21 +46,21 @@ const iconMap: Record<string, string> = {
 
 /** 类目可选图标（用于新建/编辑时选择） */
 export const categoryIcons: IconOption[] = [
-  { key: 'RunLeft', emoji: '🏃', label: '跑步' },
-  { key: 'Code', emoji: '💻', label: '刷题' },
-  { key: 'Book', emoji: '📖', label: '读书' },
-  { key: 'Swim', emoji: '🏊', label: '游泳' },
-  { key: 'Gym', emoji: '💪', label: '健身' },
-  { key: 'Bike', emoji: '🚴', label: '骑行' },
-  { key: 'Yoga', emoji: '🧘', label: '瑜伽' },
-  { key: 'Meditate', emoji: '🧘‍♂️', label: '冥想' },
-  { key: 'Sleep', emoji: '😴', label: '早睡' },
-  { key: 'Coffee', emoji: '☕', label: '早起' },
-  { key: 'English', emoji: '🇬🇧', label: '英语' },
-  { key: 'Piano', emoji: '🎹', label: '练琴' },
-  { key: 'Pen', emoji: '✒️', label: '写作' },
-  { key: 'Camera', emoji: '📷', label: '摄影' },
-  { key: 'ActivitySource', emoji: '📌', label: '其他' },
+  { key: 'RunLeft', icon: 'mdi:run-fast', label: '跑步' },
+  { key: 'Code', icon: 'mdi:code-tags', label: '刷题' },
+  { key: 'Book', icon: 'mdi:book-open-variant', label: '读书' },
+  { key: 'Swim', icon: 'mdi:swim', label: '游泳' },
+  { key: 'Gym', icon: 'mdi:dumbbell', label: '健身' },
+  { key: 'Bike', icon: 'mdi:bike', label: '骑行' },
+  { key: 'Yoga', icon: 'mdi:yoga', label: '瑜伽' },
+  { key: 'Meditate', icon: 'mdi:meditation', label: '冥想' },
+  { key: 'Sleep', icon: 'mdi:sleep', label: '早睡' },
+  { key: 'Coffee', icon: 'mdi:coffee', label: '早起' },
+  { key: 'English', icon: 'mdi:translate', label: '英语' },
+  { key: 'Piano', icon: 'mdi:piano', label: '练琴' },
+  { key: 'Pen', icon: 'mdi:pen', label: '写作' },
+  { key: 'Camera', icon: 'mdi:camera', label: '摄影' },
+  { key: 'ActivitySource', icon: 'mdi:dots-horizontal', label: '其他' },
 ]
 
 /**

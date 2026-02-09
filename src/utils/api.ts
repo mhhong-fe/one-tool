@@ -49,6 +49,7 @@ apiClient.interceptors.response.use(
 export async function getConfig(): Promise<{ CATEGORIES: any[], RECORDS: any[] }> {
   try {
     const response = await apiClient.get<ApiConfigResponse>('/getConfig')
+    console.log('response', response)
     // 响应拦截器已经返回了 response.data，这里 response 就是 { message: "success", data: {...} }
     return response.data || { CATEGORIES: [], RECORDS: [] }
   } catch (error) {

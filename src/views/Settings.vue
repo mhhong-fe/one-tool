@@ -4,6 +4,7 @@ import {
   NCard,
   NButton,
   NInput,
+  NInputNumber,
   NFormItem,
   NForm,
   NRadioGroup,
@@ -27,15 +28,15 @@ const { getByCategoryId, loadRecords } = useRecords()
 
 const newName = ref('')
 const newDetailLabel = ref('详情')
-const newDetailType = ref('text')
-const newUnitsPerScore = ref(1)
-const newIcon = ref('ActivitySource')
-const editingId = ref(null)
+const newDetailType = ref<'number' | 'text'>('text')
+const newUnitsPerScore = ref<number>(1)
+const newIcon = ref<string>('ActivitySource')
+const editingId = ref<string | null>(null)
 const editingName = ref('')
 const editingDetailLabel = ref('')
-const editingDetailType = ref('text')
-const editingUnitsPerScore = ref(1)
-const editingIcon = ref('ActivitySource')
+const editingDetailType = ref<'number' | 'text'>('text')
+const editingUnitsPerScore = ref<number>(1)
+const editingIcon = ref<string>('ActivitySource')
 
 onMounted(async () => {
   await loadCategories()
@@ -49,7 +50,7 @@ async function handleAddCategory(): Promise<void> {
     return
   }
   const unitsPerScore = newDetailType.value === 'number' ? Math.max(0.01, Number(newUnitsPerScore.value) || 1) : 1
-  await add(name, newDetailLabel.value || '详情', newDetailType.value, newIcon.value, 'category-custom', unitsPerScore)
+  await add(name, newDetailLabel.value || '详情', newDetailType.value as 'number' | 'text', newIcon.value, 'category-custom', unitsPerScore)
   message.success('添加成功')
   newName.value = ''
   newDetailLabel.value = '详情'
@@ -75,10 +76,10 @@ async function saveEdit(): Promise<void> {
     return
   }
   const unitsPerScore = editingDetailType.value === 'number' ? Math.max(0.01, Number(editingUnitsPerScore.value) || 1) : 1
-  await update(editingId.value, {
+  await update(editingId.value!, {
     name,
     detailLabel: editingDetailLabel.value || '详情',
-    detailType: editingDetailType.value || 'text',
+    detailType: editingDetailType.value as 'number' | 'text',
     unitsPerScore,
     icon: editingIcon.value,
   })
@@ -133,7 +134,10 @@ async function handleFileChange(e: Event): Promise<void> {
     }
   }
   reader.readAsText(file)
-  e.target.value = ''
+  const target = e.target as HTMLInputElement
+  if (target) {
+    target.value = ''
+  }
 }
 
 function handleClearData(): void {
@@ -182,12 +186,12 @@ function handleClearData(): void {
           </NRadioGroup>
         </NFormItem>
         <NFormItem v-if="newDetailType === 'number'" label="换算分数">
-          <NInput
+          <NInputNumber
             v-model:value="newUnitsPerScore"
-            type="number"
             min="0.01"
             step="0.1"
             placeholder="每 N 单位 = 1 分"
+            size="large"
           />
           <span class="form-hint">每 {{ newUnitsPerScore || 1 }} {{ newDetailLabel || '单位' }} = 1 分</span>
         </NFormItem>
@@ -202,7 +206,8 @@ function handleClearData(): void {
               :title="opt.label"
               @click="newIcon = opt.key"
             >
-              {{ opt.emoji }}
+              <IconFont v-if="opt.icon" :name="opt.key" :size="20" />
+              <span v-else-if="opt.emoji">{{ opt.emoji }}</span>
             </button>
           </div>
         </NFormItem>
@@ -227,7 +232,8 @@ function handleClearData(): void {
                 :title="opt.label"
                 @click="editingIcon = opt.key"
               >
-                {{ opt.emoji }}
+                <IconFont v-if="opt.icon" :name="opt.key" :size="16" />
+                <span v-else-if="opt.emoji">{{ opt.emoji }}</span>
               </button>
             </div>
             <NInput v-model:value="editingName" size="small" placeholder="名称" />
@@ -236,12 +242,12 @@ function handleClearData(): void {
               <NRadio value="number">数字</NRadio>
               <NRadio value="text">文本</NRadio>
             </NRadioGroup>
-            <NInput
+            <NInputNumber
               v-if="editingDetailType === 'number'"
               v-model:value="editingUnitsPerScore"
-              type="number"
               size="small"
               min="0.01"
+              step="0.1"
               placeholder="每 N = 1 分"
               class="input-units"
             />
@@ -456,25 +462,31 @@ function handleClearData(): void {
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   background: var(--bg-card);
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
+  color: var(--text-secondary);
 }
 
 .icon-option:hover {
   border-color: var(--primary-color);
   background: var(--bg-soft);
+  color: var(--primary-color);
+  transform: scale(1.05);
 }
 
 .icon-option.active {
   border-color: var(--primary-color);
   background: var(--primary-soft);
+  color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
 }
 
 .icon-option.small {
   width: 28px;
   height: 28px;
-  font-size: 14px;
 }
 
 .hidden-input {

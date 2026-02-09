@@ -25,6 +25,8 @@ const iconMap: Record<string, string> = {
   CheckOne: 'heroicons:check-circle-solid',
   Info: 'heroicons:information-circle-solid',
   Trophy: 'heroicons:trophy-solid',
+  Calendar: 'heroicons:calendar-days-solid',
+  CheckCircle: 'heroicons:check-circle-solid',
   
   // 类目图标（使用 mdi，图标更丰富）
   RunLeft: 'mdi:run-fast',

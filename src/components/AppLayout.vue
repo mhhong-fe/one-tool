@@ -24,7 +24,7 @@ const activeKey = computed(() => route.path || '/')
 </script>
 
 <template>
-  <NLayout has-sider class="app-layout">
+  <NLayout has-sider class="app-layout" style="height: 100vh; width: 100vw;">
     <NLayoutSider
       v-if="isDesktop"
       bordered
@@ -35,7 +35,9 @@ const activeKey = computed(() => route.path || '/')
       class="layout-sider"
     >
       <div class="layout-logo">
-        <span class="logo-icon" />
+        <div class="logo-icon-wrapper">
+          <IconFont name="Trophy" class="logo-icon" :size="24" />
+        </div>
         <span class="logo-text">每日打卡</span>
       </div>
       <nav class="layout-nav">
@@ -53,12 +55,12 @@ const activeKey = computed(() => route.path || '/')
       </nav>
     </NLayoutSider>
 
-    <NLayout class="layout-main">
+    <NLayout class="layout-main" style="height: 100vh; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
       <header v-if="!isDesktop" class="mobile-header">
         <span class="mobile-title">{{ $route.meta?.title || '每日打卡' }}</span>
       </header>
 
-      <NLayoutContent class="layout-content" :native-scrollbar="false">
+      <NLayoutContent class="layout-content" :native-scrollbar="false" style="height: 100%; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
         <main class="main-wrapper">
           <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
@@ -87,14 +89,20 @@ const activeKey = computed(() => route.path || '/')
 
 <style scoped>
 .app-layout {
-  min-height: 100vh;
+  height: 100vh !important;
+  width: 100vw !important;
   background: transparent;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .layout-sider {
   background: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(12px);
   border-right: 1px solid var(--border-soft);
+  height: 100vh !important;
+  flex-shrink: 0;
 }
 
 .layout-logo {
@@ -104,12 +112,21 @@ const activeKey = computed(() => route.path || '/')
   padding: 28px 24px;
 }
 
-.logo-icon {
+.logo-icon-wrapper {
   width: 42px;
   height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--primary-gradient);
   border-radius: 14px;
   box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+  flex-shrink: 0;
+}
+
+.logo-icon {
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
 }
 
 .logo-text {
@@ -165,6 +182,12 @@ const activeKey = computed(() => route.path || '/')
 .layout-main {
   position: relative;
   z-index: 1;
+  height: 100vh !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
 }
 
 .main-wrapper {
@@ -172,6 +195,9 @@ const activeKey = computed(() => route.path || '/')
   margin: 0 auto;
   padding: 28px 20px;
   padding-bottom: 100px;
+  width: 100%;
+  height: auto;
+  min-height: 100%;
 }
 
 @media (min-width: 1000px) {

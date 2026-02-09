@@ -8,13 +8,85 @@ html {
 }
 
 html,
-body,
-#app {
-  height: 100%;
+body {
+  height: 100vh;
+  width: 100vw;
   margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#app {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Hiragino Sans GB', sans-serif;
   color: var(--text-primary);
   background: var(--bg-page);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Naive UI Layout 全屏样式 */
+.n-config-provider,
+.n-message-provider,
+.n-dialog-provider {
+  height: 100vh !important;
+  width: 100vw !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 确保所有层级的 layout 都是全屏 */
+.n-layout.has-sider {
+  height: 100vh !important;
+  width: 100vw !important;
+  display: flex !important;
+  flex-direction: row !important;
+  overflow: hidden !important;
+}
+
+.n-layout:not(.has-sider) {
+  height: 100vh !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.n-layout-sider {
+  height: 100vh !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+}
+
+.n-layout-content {
+  height: 100% !important;
+  width: 100% !important;
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  min-height: 0 !important;
+}
+
+.n-layout-scroll-container {
+  height: 100% !important;
+  width: 100% !important;
+  max-height: 100% !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  flex: 1 !important;
+  min-height: 0 !important;
+  position: relative;
 }
 
 /* 温暖渐变背景 */

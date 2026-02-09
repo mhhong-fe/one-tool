@@ -69,7 +69,8 @@ export interface MenuOption {
  */
 export interface IconOption {
   key: string
-  emoji: string
+  icon?: string // Iconify 图标名称
+  emoji?: string // 保留 emoji 作为 fallback
   label: string
 }
 
