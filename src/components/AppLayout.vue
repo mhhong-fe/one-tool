@@ -120,7 +120,7 @@ const activeKey = computed(() => route.path || '/')
   justify-content: center;
   background: var(--primary-gradient);
   border-radius: 14px;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.35);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
   flex-shrink: 0;
 }
 

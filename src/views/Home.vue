@@ -92,7 +92,7 @@ const greeting = computed(() => {
         <NProgress
           type="line"
           :percentage="todayRate"
-          :color="todayRate >= 100 ? 'var(--primary-color)' : 'var(--warning-color)'"
+          :color="todayRate >= 100 ? 'var(--primary-color)' : 'var(--primary-light)'"
           :rail-color="'var(--border-soft)'"
           :height="10"
           :border-radius="5"
@@ -171,10 +171,10 @@ const greeting = computed(() => {
 .header-content {
   position: relative;
   padding: 32px 28px;
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(59, 130, 246, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(59, 130, 246, 0.05) 100%);
   border-radius: var(--radius-xl);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.1);
   box-shadow: var(--shadow-sm);
 }
 
@@ -230,7 +230,7 @@ const greeting = computed(() => {
 .decoration-circle {
   position: absolute;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
   animation: float 6s ease-in-out infinite;
 }
 
@@ -358,8 +358,8 @@ const greeting = computed(() => {
   align-items: center;
   gap: 6px;
   padding: 10px 18px !important;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0.08) 100%) !important;
-  color: var(--warning-color) !important;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.08) 100%) !important;
+  color: var(--primary-color) !important;
   border: none !important;
   font-size: 14px !important;
   cursor: pointer;
@@ -368,10 +368,11 @@ const greeting = computed(() => {
 
 .tag-remind:hover {
   transform: scale(1.02);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.12) 100%) !important;
 }
 
 .tag-icon {
-  color: var(--warning-color);
+  color: var(--primary-color);
 }
 
 .record-list {
@@ -395,7 +396,7 @@ const greeting = computed(() => {
 
 .record-item:hover {
   box-shadow: var(--shadow-md);
-  border-color: rgba(34, 197, 94, 0.3);
+  border-color: rgba(99, 102, 241, 0.3);
 }
 
 .record-cat {
@@ -440,11 +441,11 @@ const greeting = computed(() => {
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
 }
 </style>

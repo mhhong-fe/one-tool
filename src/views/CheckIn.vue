@@ -153,10 +153,10 @@ function handleClear(): void {
   align-items: center;
   gap: 20px;
   padding: 28px;
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(59, 130, 246, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(59, 130, 246, 0.05) 100%);
   border-radius: var(--radius-xl);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.1);
   box-shadow: var(--shadow-sm);
 }
 
@@ -169,7 +169,7 @@ function handleClear(): void {
   justify-content: center;
   background: var(--primary-gradient);
   border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
 .title-icon {

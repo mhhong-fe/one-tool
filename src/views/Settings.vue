@@ -481,7 +481,7 @@ function handleClearData(): void {
   border-color: var(--primary-color);
   background: var(--primary-soft);
   color: var(--primary-color);
-  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
 }
 
 .icon-option.small {

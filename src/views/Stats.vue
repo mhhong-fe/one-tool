@@ -408,7 +408,7 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
   align-items: center;
   gap: 20px;
   padding: 28px;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(34, 197, 94, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(59, 130, 246, 0.05) 100%);
   border-radius: var(--radius-xl);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(59, 130, 246, 0.1);
@@ -422,7 +422,7 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #3b82f6 0%, #22c55e 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
   border-radius: var(--radius-lg);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
 }

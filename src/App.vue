@@ -4,9 +4,9 @@ import AppLayout from './components/AppLayout.vue'
 
 const themeOverrides = {
   common: {
-    primaryColor: '#22c55e',
-    primaryColorHover: '#16a34a',
-    primaryColorPressed: '#15803d',
+    primaryColor: '#6366f1',
+    primaryColorHover: '#4f46e5',
+    primaryColorPressed: '#4338ca',
     borderRadius: '10px',
     borderRadiusSmall: '8px',
   },
