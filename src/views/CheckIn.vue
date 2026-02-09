@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { NForm, NFormItem, NSelect, NInput, NInputNumber, NButton, useMessage } from 'naive-ui'
+import { NForm, NFormItem, NSelect, NInput, NInputNumber, NButton, NDatePicker, useMessage } from 'naive-ui'
 import { useCategories } from '../composables/useCategories'
 import { useRecords } from '../composables/useRecords'
-import { todayStr as getTodayStr } from '../utils/date'
+import { dayjs } from '../utils/date'
 import IconFont from '../components/IconFont.vue'
 
 const message = useMessage()
@@ -13,8 +13,8 @@ const { add: addRecord } = useRecords()
 const categoryId = ref<string | null>(null)
 const detail = ref<string>('')
 const detailNumber = ref<number | null>(null)
-
-const todayStr = computed(() => getTodayStr())
+const selectedDate = ref<number>(Date.now())
+const selectedDateStr = computed(() => dayjs(selectedDate.value).format('YYYY-MM-DD'))
 
 const categoryOptions = computed(() =>
   categories.value.map((c) => ({
@@ -64,7 +64,7 @@ async function handleSubmit(): Promise<void> {
   
   await addRecord({
     categoryId: categoryId.value!,
-    date: todayStr.value,
+    date: selectedDateStr.value,
     detail: detailValue,
   })
   message.success('打卡成功')
@@ -88,13 +88,24 @@ function handleClear(): void {
         </div>
         <div class="header-text">
           <h1 class="page-title">打卡</h1>
-          <p class="page-desc">记录今天的努力</p>
+          <p class="page-desc">记录你的努力</p>
         </div>
       </div>
     </header>
 
     <div class="form-card">
       <NForm :model="{ categoryId, detail }" label-placement="top">
+        <NFormItem label="选择日期" required>
+          <NDatePicker
+            v-model:value="selectedDate"
+            type="date"
+            size="large"
+            :is-date-disabled="(timestamp: number) => timestamp > Date.now()"
+            :max="Date.now()"
+            placeholder="选择打卡日期"
+            clearable
+          />
+        </NFormItem>
         <NFormItem label="选择类目" required>
           <NSelect
             v-model:value="categoryId"
@@ -212,7 +223,8 @@ function handleClear(): void {
 
 .form-card :deep(.n-input),
 .form-card :deep(.n-input-number),
-.form-card :deep(.n-base-selection) {
+.form-card :deep(.n-base-selection),
+.form-card :deep(.n-date-picker) {
   width: 100%;
   border-radius: var(--radius-md);
 }
