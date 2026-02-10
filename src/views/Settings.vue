@@ -222,64 +222,90 @@ function handleClearData(): void {
       <ul class="category-list">
         <li v-for="c in categories" :key="c.id" class="category-item">
           <template v-if="editingId === c.id">
-            <div class="icon-picker inline">
-              <button
-                v-for="opt in categoryIcons"
-                :key="opt.key"
-                type="button"
-                class="icon-option small"
-                :class="{ active: editingIcon === opt.key }"
-                :title="opt.label"
-                @click="editingIcon = opt.key"
-              >
-                <IconFont v-if="opt.icon" :name="opt.key" :size="16" />
-                <span v-else-if="opt.emoji">{{ opt.emoji }}</span>
-              </button>
+            <div class="category-edit-form">
+              <div class="edit-row">
+                <div class="edit-label">图标</div>
+                <div class="icon-picker inline">
+                  <button
+                    v-for="opt in categoryIcons"
+                    :key="opt.key"
+                    type="button"
+                    class="icon-option small"
+                    :class="{ active: editingIcon === opt.key }"
+                    :title="opt.label"
+                    @click="editingIcon = opt.key"
+                  >
+                    <IconFont v-if="opt.icon" :name="opt.key" :size="16" />
+                    <span v-else-if="opt.emoji">{{ opt.emoji }}</span>
+                  </button>
+                </div>
+              </div>
+              <div class="edit-row">
+                <div class="edit-label">名称</div>
+                <NInput v-model:value="editingName" size="small" placeholder="名称" />
+              </div>
+              <div class="edit-row">
+                <div class="edit-label">详情标签</div>
+                <NInput v-model:value="editingDetailLabel" size="small" placeholder="详情标签" />
+              </div>
+              <div class="edit-row">
+                <div class="edit-label">类型</div>
+                <NRadioGroup v-model:value="editingDetailType" size="small">
+                  <NRadio value="number">数字</NRadio>
+                  <NRadio value="text">文本</NRadio>
+                </NRadioGroup>
+              </div>
+              <div v-if="editingDetailType === 'number'" class="edit-row">
+                <div class="edit-label">计分规则</div>
+                <NInputNumber
+                  v-model:value="editingUnitsPerScore"
+                  size="small"
+                  min="0.01"
+                  step="0.1"
+                  placeholder="每 N = 1 分"
+                  class="input-units"
+                />
+              </div>
+              <div class="edit-actions">
+                <NButton size="small" @click="saveEdit">保存</NButton>
+                <NButton size="small" secondary @click="cancelEdit">取消</NButton>
+              </div>
             </div>
-            <NInput v-model:value="editingName" size="small" placeholder="名称" />
-            <NInput v-model:value="editingDetailLabel" size="small" placeholder="详情标签" />
-            <NRadioGroup v-model:value="editingDetailType" size="small">
-              <NRadio value="number">数字</NRadio>
-              <NRadio value="text">文本</NRadio>
-            </NRadioGroup>
-            <NInputNumber
-              v-if="editingDetailType === 'number'"
-              v-model:value="editingUnitsPerScore"
-              size="small"
-              min="0.01"
-              step="0.1"
-              placeholder="每 N = 1 分"
-              class="input-units"
-            />
-            <NButton size="small" @click="saveEdit">保存</NButton>
-            <NButton size="small" secondary @click="cancelEdit">取消</NButton>
           </template>
           <template v-else>
-            <IconFont :name="c.icon || 'ActivitySource'" class="cat-icon" :size="22" />
-            <span class="cat-name">{{ c.name }}</span>
-            <span class="cat-meta">
-              {{ c.detailLabel }} ({{ c.detailType === 'number' ? '数字' : '文本' }})
-              <template v-if="c.detailType === 'number'">
-                · 每 {{ c.unitsPerScore ?? 1 }}{{ c.detailLabel }} = 1分
-              </template>
-            </span>
-            <NButton size="small" secondary @click="startEdit(c)">
-              <span class="btn-with-icon">
-                <IconFont name="Edit" :size="14" style="margin-right: 4px;" />
-                编辑
-              </span>
-            </NButton>
-            <NPopconfirm @positive-click="handleDelete(c)">
-              <template #trigger>
-                <NButton size="small" type="error" tertiary>
-                  <span class="btn-with-icon">
-                    <IconFont name="Delete" :size="14" style="margin-right: 4px;" />
-                    删除
-                  </span>
-                </NButton>
-              </template>
-              确定删除该类目？
-            </NPopconfirm>
+            <div class="category-info">
+              <div class="category-header">
+                <IconFont :name="c.icon || 'ActivitySource'" class="cat-icon" :size="22" />
+                <span class="cat-name">{{ c.name }}</span>
+              </div>
+              <div class="category-details">
+                <span class="cat-meta">
+                  {{ c.detailLabel }} ({{ c.detailType === 'number' ? '数字' : '文本' }})
+                  <template v-if="c.detailType === 'number'">
+                    · 每 {{ c.unitsPerScore ?? 1 }}{{ c.detailLabel }} = 1分
+                  </template>
+                </span>
+              </div>
+            </div>
+            <div class="category-actions">
+              <NButton size="small" secondary @click="startEdit(c)">
+                <span class="btn-with-icon">
+                  <IconFont name="Edit" :size="14" style="margin-right: 4px;" />
+                  编辑
+                </span>
+              </NButton>
+              <NPopconfirm @positive-click="handleDelete(c)">
+                <template #trigger>
+                  <NButton size="small" type="error" tertiary>
+                    <span class="btn-with-icon">
+                      <IconFont name="Delete" :size="14" style="margin-right: 4px;" />
+                      删除
+                    </span>
+                  </NButton>
+                </template>
+                确定删除该类目？
+              </NPopconfirm>
+            </div>
           </template>
         </li>
       </ul>
@@ -398,18 +424,34 @@ function handleClearData(): void {
 
 .category-item {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 16px 20px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
   border: 1px solid var(--border-soft);
   border-radius: var(--radius-md);
   margin-bottom: 12px;
+  background: var(--bg-card);
   transition: all 0.2s ease;
 }
 
 .category-item:hover {
   box-shadow: var(--shadow-sm);
+  border-color: var(--primary-light);
+}
+
+.category-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .cat-icon {
@@ -421,11 +463,21 @@ function handleClearData(): void {
   font-weight: 600;
   font-size: 15px;
   color: var(--text-primary);
+  flex: 1;
+  min-width: 0;
 }
 
 .cat-meta {
   font-size: 13px;
   color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.category-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .btn-with-icon {
@@ -442,7 +494,36 @@ function handleClearData(): void {
 }
 
 .input-units {
-  width: 90px;
+  width: 150px;
+}
+
+.category-edit-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.edit-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.edit-label {
+  min-width: 80px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
 }
 
 .icon-picker {
