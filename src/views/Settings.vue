@@ -433,6 +433,9 @@ function handleClearData(): void {
   margin-bottom: 12px;
   background: var(--bg-card);
   transition: all 0.2s ease;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .category-item:hover {
@@ -502,12 +505,19 @@ function handleClearData(): void {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .edit-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
+  min-width: 0;
+  width: 100%;
+}
+
+.edit-row:has(.icon-picker) {
+  align-items: flex-start;
 }
 
 .edit-label {
@@ -516,6 +526,21 @@ function handleClearData(): void {
   font-weight: 500;
   color: var(--text-secondary);
   flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.edit-row :deep(.n-input),
+.edit-row :deep(.n-input-number),
+.edit-row :deep(.n-radio-group) {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.edit-row .icon-picker {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .edit-actions {
@@ -530,10 +555,13 @@ function handleClearData(): void {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .icon-picker.inline {
-  flex-shrink: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .icon-option {
