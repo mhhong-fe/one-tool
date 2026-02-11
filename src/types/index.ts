@@ -19,6 +19,7 @@ export interface Record {
   categoryId: string
   date: string
   detail: string
+  remark?: string // 备注字段（可选）
   createdAt: number
 }
 

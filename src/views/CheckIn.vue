@@ -13,6 +13,7 @@ const { add: addRecord } = useRecords()
 const categoryId = ref<string | null>(null)
 const detail = ref<string>('')
 const detailNumber = ref<number | null>(null)
+const remark = ref<string>('')
 const selectedDate = ref<number>(Date.now())
 const selectedDateStr = computed(() => dayjs(selectedDate.value).format('YYYY-MM-DD'))
 
@@ -34,6 +35,7 @@ const detailType = computed(() => selectedCategory.value?.detailType || 'text')
 watch(categoryId, () => {
   detail.value = ''
   detailNumber.value = null
+  remark.value = ''
 })
 
 async function handleSubmit(): Promise<void> {
@@ -66,16 +68,19 @@ async function handleSubmit(): Promise<void> {
     categoryId: categoryId.value!,
     date: selectedDateStr.value,
     detail: detailValue,
+    remark: remark.value.trim() || undefined,
   })
   message.success('打卡成功')
   detail.value = ''
   detailNumber.value = null
+  remark.value = ''
 }
 
 function handleClear(): void {
   categoryId.value = null
   detail.value = ''
   detailNumber.value = null
+  remark.value = ''
 }
 </script>
 
@@ -133,6 +138,18 @@ function handleClear(): void {
             clearable
             size="large"
             @keyup.enter="handleSubmit"
+          />
+        </NFormItem>
+        <NFormItem label="备注">
+          <NInput
+            v-model:value="remark"
+            type="textarea"
+            placeholder="可选，添加备注信息"
+            clearable
+            size="large"
+            :rows="3"
+            :maxlength="200"
+            show-count
           />
         </NFormItem>
         <div class="form-actions">
@@ -224,7 +241,8 @@ function handleClear(): void {
 .form-card :deep(.n-input),
 .form-card :deep(.n-input-number),
 .form-card :deep(.n-base-selection),
-.form-card :deep(.n-date-picker) {
+.form-card :deep(.n-date-picker),
+.form-card :deep(.n-textarea) {
   width: 100%;
   border-radius: var(--radius-md);
 }

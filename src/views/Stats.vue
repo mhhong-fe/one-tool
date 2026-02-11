@@ -12,6 +12,8 @@ import {
   NButton,
   NModal,
   NInput,
+  NForm,
+  NFormItem,
   NPopover,
   useMessage,
   useDialog,
@@ -30,6 +32,7 @@ const { list: records, update: updateRecord, remove: removeRecord } = useRecords
 const showEditModal = ref(false)
 const editRecordRow = ref<any>(null)
 const editRecordDetail = ref('')
+const editRecordRemark = ref('')
 const selectedDateStr = ref('')
 const showDayDetail = ref(false)
 
@@ -176,15 +179,20 @@ function openDayDetail(dateStr: string): void {
 function handleEditRecord(row: any): void {
   editRecordRow.value = row
   editRecordDetail.value = row.detail || ''
+  editRecordRemark.value = row.remark || ''
   showEditModal.value = true
 }
 
 async function saveEditRecord(): Promise<void> {
   if (!editRecordRow.value) return
-  await updateRecord(editRecordRow.value.id, { detail: editRecordDetail.value })
+  await updateRecord(editRecordRow.value.id, { 
+    detail: editRecordDetail.value,
+    remark: editRecordRemark.value.trim() || undefined,
+  })
   message.success('已更新')
   showEditModal.value = false
   editRecordRow.value = null
+  editRecordRemark.value = ''
 }
 
 function handleDeleteRecord(row: any): void {
@@ -201,9 +209,10 @@ function handleDeleteRecord(row: any): void {
 }
 
 const detailColumns = [
-  { title: '类目', key: 'categoryName', width: 120 },
-  { title: '详情', key: 'detail', render: (row) => getDetailWithUnit(row) },
-  { title: '分数', key: 'score', width: 56, render: (row) => (row.score != null ? row.score.toFixed(1) : '-') },
+  { title: '类目', key: 'categoryName', width: 100 },
+  { title: '详情', key: 'detail', width: 120, render: (row) => getDetailWithUnit(row) },
+  { title: '备注', key: 'remark', width: 180, render: (row) => row.remark || '-' },
+  { title: '分数', key: 'score', width: 70, render: (row) => (row.score != null ? row.score.toFixed(1) : '-') },
   {
     title: '操作',
     key: 'actions',
@@ -374,7 +383,7 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
       v-model:show="showDayDetail"
       preset="card"
       :title="selectedDateStr ? dayjs(selectedDateStr).format('YYYY年M月D日') + ' 打卡明细' + (selectedDayTotalScore > 0 ? ` · 共 ${selectedDayTotalScore.toFixed(1)} 分` : '') : ''"
-      style="width: 420px;"
+      style="width: 600px; max-width: 90vw;"
       @mask-click="showDayDetail = false"
     >
       <NDataTable
@@ -387,8 +396,22 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
       <p v-else class="empty-detail">该日暂无打卡记录</p>
     </NModal>
 
-    <NModal v-model:show="showEditModal" preset="dialog" title="编辑打卡详情" positive-text="保存" negative-text="取消" @positive-click="saveEditRecord">
-      <NInput v-model:value="editRecordDetail" placeholder="详情" />
+    <NModal v-model:show="showEditModal" preset="dialog" title="编辑打卡详情" positive-text="保存" negative-text="取消" @positive-click="saveEditRecord" style="width: 420px;">
+      <NForm label-placement="top" style="margin-top: 16px;">
+        <NFormItem label="详情">
+          <NInput v-model:value="editRecordDetail" placeholder="详情" />
+        </NFormItem>
+        <NFormItem label="备注">
+          <NInput
+            v-model:value="editRecordRemark"
+            type="textarea"
+            placeholder="可选，添加备注信息"
+            :rows="3"
+            :maxlength="200"
+            show-count
+          />
+        </NFormItem>
+      </NForm>
     </NModal>
   </div>
 </template>
