@@ -39,10 +39,15 @@ const iconMap: Record<string, string> = {
   Sleep: 'mdi:sleep',
   Meditate: 'mdi:meditation',
   Coffee: 'mdi:coffee',
+  EarlySleep: 'mdi:bed-clock',
   English: 'mdi:translate',
   Piano: 'mdi:piano',
   Pen: 'mdi:pen',
   Camera: 'mdi:camera',
+  Dumbbell: 'mdi:dumbbell',
+  PushUp: 'mdi:human-handsdown',
+  Crunch: 'mdi:yoga',
+  CoreWorkout: 'mdi:human-handsdown',
   ActivitySource: 'mdi:dots-horizontal',
 }
 
