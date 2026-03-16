@@ -383,7 +383,7 @@ const weekLabels = ['', '一', '二', '三', '四', '五', '六', '日']
       v-model:show="showDayDetail"
       preset="card"
       :title="selectedDateStr ? dayjs(selectedDateStr).format('YYYY年M月D日') + ' 打卡明细' + (selectedDayTotalScore > 0 ? ` · 共 ${selectedDayTotalScore.toFixed(1)} 分` : '') : ''"
-      style="width: 600px; max-width: 90vw;"
+      style="width: 900px; max-width: 90vw;"
       @mask-click="showDayDetail = false"
     >
       <NDataTable
