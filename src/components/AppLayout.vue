@@ -194,7 +194,6 @@ const activeKey = computed(() => route.path || '/')
   max-width: 800px;
   margin: 0 auto;
   padding: 28px 20px;
-  padding-bottom: max(100px, calc(80px + env(safe-area-inset-bottom)));
   width: 100%;
   height: auto;
   min-height: 100%;
@@ -209,8 +208,7 @@ const activeKey = computed(() => route.path || '/')
 }
 
 .mobile-header {
-  position: sticky;
-  top: 0;
+  flex-shrink: 0;
   z-index: 10;
   display: flex;
   align-items: center;
@@ -228,10 +226,7 @@ const activeKey = computed(() => route.path || '/')
 }
 
 .mobile-tab {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  flex-shrink: 0;
   z-index: 10;
   display: flex;
   justify-content: space-around;
