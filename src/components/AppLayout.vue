@@ -60,7 +60,7 @@ const activeKey = computed(() => route.path || '/')
         <span class="mobile-title">{{ $route.meta?.title || '每日打卡' }}</span>
       </header>
 
-      <NLayoutContent class="layout-content" :native-scrollbar="false" style="height: 100%; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+      <NLayoutContent class="layout-content" :native-scrollbar="false" style="flex: 1; min-height: 0;">
         <main class="main-wrapper">
           <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
@@ -194,7 +194,7 @@ const activeKey = computed(() => route.path || '/')
   max-width: 800px;
   margin: 0 auto;
   padding: 28px 20px;
-  padding-bottom: 100px;
+  padding-bottom: max(100px, calc(80px + env(safe-area-inset-bottom)));
   width: 100%;
   height: auto;
   min-height: 100%;
