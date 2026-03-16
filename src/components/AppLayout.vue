@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { NLayout, NLayoutSider, NLayoutContent } from 'naive-ui'
+import { NLayout, NLayoutSider } from 'naive-ui'
 import { useRoute, useRouter } from 'vue-router'
 import { useBreakpoint } from '../composables/useBreakpoint'
 import IconFont from './IconFont.vue'
@@ -55,12 +55,12 @@ const activeKey = computed(() => route.path || '/')
       </nav>
     </NLayoutSider>
 
-    <NLayout class="layout-main" style="height: 100vh; flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+    <div class="layout-main">
       <header v-if="!isDesktop" class="mobile-header">
         <span class="mobile-title">{{ $route.meta?.title || '每日打卡' }}</span>
       </header>
 
-      <NLayoutContent class="layout-content" :native-scrollbar="false" style="flex: 1; min-height: 0;">
+      <div class="layout-scroll">
         <main class="main-wrapper">
           <router-view v-slot="{ Component }">
             <transition name="fade" mode="out-in">
@@ -68,7 +68,7 @@ const activeKey = computed(() => route.path || '/')
             </transition>
           </router-view>
         </main>
-      </NLayoutContent>
+      </div>
 
       <nav v-if="!isDesktop" class="mobile-tab">
         <button
@@ -83,7 +83,7 @@ const activeKey = computed(() => route.path || '/')
           <span class="tab-label">{{ opt.label }}</span>
         </button>
       </nav>
-    </NLayout>
+    </div>
   </NLayout>
 </template>
 
@@ -182,12 +182,18 @@ const activeKey = computed(() => route.path || '/')
 .layout-main {
   position: relative;
   z-index: 1;
-  height: 100vh !important;
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.layout-scroll {
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .main-wrapper {
