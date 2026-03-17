@@ -24,7 +24,7 @@ const activeKey = computed(() => route.path || '/')
 </script>
 
 <template>
-  <NLayout has-sider class="app-layout" style="height: 100vh; width: 100vw;">
+  <NLayout has-sider class="app-layout" style="height: 100%; width: 100%;">
     <NLayoutSider
       v-if="isDesktop"
       bordered
@@ -89,8 +89,8 @@ const activeKey = computed(() => route.path || '/')
 
 <style scoped>
 .app-layout {
-  height: 100vh !important;
-  width: 100vw !important;
+  height: 100% !important;
+  width: 100% !important;
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -101,7 +101,7 @@ const activeKey = computed(() => route.path || '/')
   background: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(12px);
   border-right: 1px solid var(--border-soft);
-  height: 100vh !important;
+  height: 100% !important;
   flex-shrink: 0;
 }
 

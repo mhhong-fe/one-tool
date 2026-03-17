@@ -9,7 +9,7 @@ html {
 
 html,
 body {
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
   margin: 0;
   padding: 0;
@@ -17,7 +17,7 @@ body {
 }
 
 #app {
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
   margin: 0;
   padding: 0;
@@ -37,7 +37,7 @@ body {
 .n-config-provider,
 .n-message-provider,
 .n-dialog-provider {
-  height: 100vh !important;
+  height: 100dvh !important;
   width: 100vw !important;
   display: flex;
   flex-direction: column;
@@ -46,15 +46,15 @@ body {
 
 /* 确保所有层级的 layout 都是全屏 */
 .n-layout.has-sider {
-  height: 100vh !important;
-  width: 100vw !important;
+  height: 100% !important;
+  width: 100% !important;
   display: flex !important;
   flex-direction: row !important;
   overflow: hidden !important;
 }
 
 .n-layout:not(.has-sider) {
-  height: 100vh !important;
+  height: 100dvh !important;
   flex: 1 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -62,7 +62,7 @@ body {
 }
 
 .n-layout-sider {
-  height: 100vh !important;
+  height: 100% !important;
   overflow-y: auto;
   overflow-x: hidden;
   flex-shrink: 0;
