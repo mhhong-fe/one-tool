@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import {
     NModal,
     NButton,
@@ -18,6 +18,11 @@ const message = useMessage();
 const {
     list,
     stats,
+    detail,
+    loading,
+    load,
+    updateDetail,
+    exportData,
     add,
     update,
     remove,
@@ -27,6 +32,20 @@ const {
     updateGoal,
     removeGoal,
 } = useLeetCode();
+
+onMounted(() => load());
+
+// ─── detail 编辑 ──────────────────────────────────────────
+const editingDetail = ref(false);
+const detailDraft = ref("");
+function startDetailEdit() {
+    detailDraft.value = detail.value;
+    editingDetail.value = true;
+}
+async function saveDetail() {
+    await updateDetail(detailDraft.value);
+    editingDetail.value = false;
+}
 
 // ─── Tab ────────────────────────────────────────────────
 const activeTab = ref<"list" | "calendar">("list");
@@ -358,6 +377,33 @@ function handleDeleteGoal() {
 
 <template>
     <div class="page-lc">
+        <!-- 页眉 -->
+        <div class="lc-header">
+            <h1 class="lc-title">LeetCode</h1>
+            <div style="display:flex;gap:8px;align-items:center">
+                <span v-if="loading" style="font-size:13px;color:var(--text-tertiary)">加载中...</span>
+                <NButton size="small" @click="exportData">导出 JSON</NButton>
+            </div>
+        </div>
+
+        <!-- detail 卡片 -->
+        <div class="lc-detail-card">
+            <div v-if="!editingDetail" class="lc-detail-text" @click="startDetailEdit">
+                <span v-if="detail">{{ detail }}</span>
+                <span v-else class="lc-placeholder">点击添加备注说明...</span>
+            </div>
+            <div v-else>
+                <NInput
+                    v-model:value="detailDraft"
+                    type="textarea"
+                    :autosize="{ minRows: 2, maxRows: 6 }"
+                    placeholder="备注说明"
+                    @blur="saveDetail"
+                    @keydown.enter.ctrl="saveDetail"
+                />
+            </div>
+        </div>
+
         <!-- 统计 -->
         <section class="stats-row">
             <div class="stat-card">
@@ -997,40 +1043,45 @@ function handleDeleteGoal() {
 
 /* ── 页头 ─────────────────────────── */
 .lc-header {
-    margin-bottom: 24px;
-}
-.lc-header-inner {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 24px 28px;
-    background: linear-gradient(
-        135deg,
-        rgba(99, 102, 241, 0.09) 0%,
-        rgba(34, 197, 94, 0.06) 100%
-    );
-    border-radius: var(--radius-xl);
-    border: 1px solid rgba(99, 102, 241, 0.12);
-    box-shadow: var(--shadow-sm);
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
 }
-.lc-header-icon {
-    width: 52px;
-    height: 52px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #6366f1, #22c55e);
+
+.lc-title {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.lc-detail-card {
+    padding: 14px 18px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-soft);
     border-radius: var(--radius-lg);
-    color: #fff;
-    flex-shrink: 0;
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.3);
+    margin-bottom: 20px;
+    cursor: text;
+}
+
+.lc-detail-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    white-space: pre-wrap;
+}
+
+.lc-placeholder {
+    color: var(--text-tertiary);
+    font-style: italic;
 }
 .lc-title {
     margin: 0 0 4px;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 700;
     color: var(--text-primary);
-    letter-spacing: -0.3px;
 }
 .lc-subtitle {
     margin: 0;
@@ -1065,16 +1116,13 @@ function handleDeleteGoal() {
     color: var(--primary-color);
 }
 .stat-num.green {
-    color: #3b82f6;
+    color: var(--success-color);
 }
 .stat-num.red {
-    color: #f97316;
+    color: var(--danger-color);
 }
 .stat-num.gradient {
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--primary-color);
 }
 .stat-label {
     font-size: 12px;
@@ -1140,7 +1188,7 @@ function handleDeleteGoal() {
 }
 .goal-card:hover {
     box-shadow: var(--shadow-md);
-    border-color: rgba(99, 102, 241, 0.25);
+    border-color: var(--border-color);
     transform: translateY(-1px);
 }
 
@@ -1159,7 +1207,7 @@ function handleDeleteGoal() {
     font-weight: 600;
     padding: 2px 8px;
     border-radius: 10px;
-    background: rgba(99, 102, 241, 0.12);
+    background: var(--primary-soft);
     color: var(--primary-color);
 }
 .goal-period {
@@ -1204,7 +1252,7 @@ function handleDeleteGoal() {
     min-width: 4px;
 }
 .goal-bar-fill.bar-done {
-    background: linear-gradient(90deg, #3b82f6, #6366f1);
+    background: var(--success-color);
 }
 
 .goal-card-bottom {
@@ -1250,7 +1298,7 @@ function handleDeleteGoal() {
 .goal-badge-done {
     font-size: 13px;
     font-weight: 600;
-    color: #3b82f6;
+    color: var(--success-color);
 }
 
 /* ── 目标弹窗 ─────────────────────── */
@@ -1328,18 +1376,16 @@ function handleDeleteGoal() {
     padding: 6px 18px;
     border-radius: 20px;
     border: none;
-    background: var(--primary-gradient);
+    background: #1A1A1A;
     color: #fff;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.28);
-    transition: all 0.2s;
+    transition: background 0.15s;
 }
 .btn-primary-add:hover {
-    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
-    transform: translateY(-1px);
+    background: #2D2D2D;
 }
 
 /* ── 题目卡片 ─────────────────────── */
@@ -1367,10 +1413,10 @@ function handleDeleteGoal() {
     transform: translateY(-1px);
 }
 .problem-card.passed {
-    border-left-color: #3b82f6;
+    border-left-color: var(--success-color);
 }
 .problem-card.failed {
-    border-left-color: #f97316;
+    border-left-color: var(--primary-color);
 }
 
 .card-no-badge {
@@ -1388,14 +1434,14 @@ function handleDeleteGoal() {
     color: var(--text-secondary);
 }
 .card-no-badge.badge-pass {
-    background: rgba(59, 130, 246, 0.1);
-    border-color: rgba(59, 130, 246, 0.3);
-    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.10);
+    border-color: rgba(59, 130, 246, 0.35);
+    color: #2563eb;
 }
 .card-no-badge.badge-fail {
-    background: rgba(249, 115, 22, 0.1);
-    border-color: rgba(249, 115, 22, 0.3);
-    color: #f97316;
+    background: rgba(255, 0, 0, 0.08);
+    border-color: rgba(255, 0, 0, 0.30);
+    color: #f00;
 }
 
 .card-body {
@@ -1464,15 +1510,11 @@ function handleDeleteGoal() {
 }
 .dot-pass {
     background: #3b82f6;
-    box-shadow:
-        0 0 0 2px rgba(59, 130, 246, 0.22),
-        0 0 7px rgba(59, 130, 246, 0.45);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), 0 0 6px rgba(59, 130, 246, 0.4);
 }
 .dot-fail {
-    background: #f97316;
-    box-shadow:
-        0 0 0 2px rgba(249, 115, 22, 0.2),
-        0 0 7px rgba(249, 115, 22, 0.4);
+    background: #f00;
+    box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.25), 0 0 6px rgba(255, 0, 0, 0.4);
 }
 
 .card-actions {
@@ -1720,9 +1762,9 @@ function handleDeleteGoal() {
     transition: all 0.15s;
 }
 .close-btn:hover {
-    background: rgba(249, 115, 22, 0.1);
-    color: #f97316;
-    border-color: #f97316;
+    background: var(--bg-soft);
+    color: var(--text-primary);
+    border-color: var(--border-color);
 }
 
 .day-problem-list {
@@ -1773,12 +1815,12 @@ function handleDeleteGoal() {
     border-radius: 10px;
 }
 .day-attempt-tag.tag-pass {
-    background: rgba(59, 130, 246, 0.12);
-    color: #3b82f6;
+    background: rgba(46, 125, 50, 0.1);
+    color: var(--success-color);
 }
 .day-attempt-tag.tag-fail {
-    background: rgba(249, 115, 22, 0.12);
-    color: #f97316;
+    background: var(--primary-soft);
+    color: var(--primary-color);
 }
 .day-attempt-note {
     color: var(--text-secondary);

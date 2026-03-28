@@ -1,37 +1,26 @@
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios'
-import type { ApiConfigResponse } from '../types'
+import { DataType } from '../types'
 
 const API_BASE_URL = 'https://mhhong.com/api/taskApi/checkin'
 
-/**
- * 创建 axios 实例
- */
+interface ApiResponse<T> {
+  message: string
+  data: T
+}
+
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  headers: { 'Content-Type': 'application/json' },
 })
 
-/**
- * 请求拦截器
- */
 apiClient.interceptors.request.use(
-  (config) => {
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
+  (config) => config,
+  (error) => Promise.reject(error),
 )
 
-/**
- * 响应拦截器
- */
 apiClient.interceptors.response.use(
-  (response: AxiosResponse<ApiConfigResponse>) => {
-    // 如果返回的 message 不是 success，抛出错误
+  (response: AxiosResponse<ApiResponse<any>>) => {
     if (response.data?.message !== 'success') {
       throw new Error(response.data?.message || '请求失败')
     }
@@ -40,37 +29,28 @@ apiClient.interceptors.response.use(
   (error) => {
     console.error('API Error:', error)
     return Promise.reject(error)
-  }
+  },
 )
 
-/**
- * 获取配置数据
- */
-export async function getConfig(): Promise<{ CATEGORIES: any[], RECORDS: any[] }> {
+export async function getConfig<T>(type: DataType): Promise<T | null> {
   try {
-    const response = await apiClient.get<ApiConfigResponse>('/getConfig')
-    console.log('response', response)
-    // 响应拦截器已经返回了 response.data，这里 response 就是 { message: "success", data: {...} }
-    return response.data || { CATEGORIES: [], RECORDS: [] }
+    const response = await apiClient.get<ApiResponse<T>>('/getConfig', { params: { type } })
+    return (response as unknown as ApiResponse<T>).data ?? null
   } catch (error) {
-    console.error('获取配置失败:', error)
-    // 返回默认值，避免应用崩溃
-    return { CATEGORIES: [], RECORDS: [] }
+    console.error(`获取 ${type} 失败:`, error)
+    return null
   }
 }
 
-/**
- * 保存配置数据
- * @param config - 配置对象，包含 CATEGORIES 和 RECORDS
- */
-export async function saveConfig(config: { CATEGORIES: any[], RECORDS: any[] }): Promise<boolean> {
+export async function saveConfig<T>(type: DataType, config: T): Promise<boolean> {
   try {
-    await apiClient.post('/saveConfig', { config })
+    await apiClient.post('/saveConfig', { type, config })
     return true
   } catch (error) {
-    console.error('保存配置失败:', error)
+    console.error(`保存 ${type} 失败:`, error)
     return false
   }
 }
 
+export { DataType }
 export default apiClient

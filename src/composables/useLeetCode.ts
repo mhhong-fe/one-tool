@@ -1,10 +1,9 @@
 import { ref, computed } from 'vue'
-import type { LeetCodeProblem, LeetCodeGoal } from '../types'
+import { createStorage } from '../utils/storage'
+import { DataType } from '../types'
+import type { LeetCodeData, LeetCodeProblem, LeetCodeGoal } from '../types'
 
-const STORAGE_KEY = 'LEETCODE_PROBLEMS'
-const GOALS_KEY = 'LEETCODE_GOALS'
-
-const DEFAULT_DATA: LeetCodeProblem[] = [
+const DEFAULT_PROBLEMS: LeetCodeProblem[] = [
   { id: '1', no: 283, title: '移动零', attempts: [{ date: '2026.02.11', passed: false, note: '' }, { date: '2026.02.14', passed: true, note: '' }, { date: '2026.02.27', passed: true, note: '' }, { date: '2026.03.17', passed: true, note: '' }] },
   { id: '2', no: 49, title: '字母异位词分组', attempts: [{ date: '2026.03.17', passed: true, note: '简单，但也需要动手做才行' }] },
   { id: '3', no: 128, title: '最长连续序列', attempts: [{ date: '2026.03.17', passed: true, note: 'O(n)复杂度未实现' }, { date: '2026.03.17', passed: false, note: '用set实现O(n)' }] },
@@ -90,100 +89,121 @@ const DEFAULT_DATA: LeetCodeProblem[] = [
   { id: '83', no: 169, title: '多数元素', attempts: [{ date: '2026.03.16', passed: false, note: '摩尔投票，技巧性很强' }] },
 ]
 
-function load(): LeetCodeProblem[] {
+const DEFAULT_DATA: LeetCodeData = {
+  detail: '',
+  problems: DEFAULT_PROBLEMS,
+  goals: [],
+}
+
+const store = createStorage<LeetCodeData>(DataType.LEETCODE, DEFAULT_DATA)
+
+// 模块级响应式状态
+const data = ref<LeetCodeData>({ ...DEFAULT_DATA, problems: [...DEFAULT_PROBLEMS] })
+const loading = ref(false)
+
+async function load(): Promise<void> {
+  loading.value = true
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) return JSON.parse(raw)
-  } catch {
-    // ignore
+    const d = await store.get()
+    data.value = d
+  } finally {
+    loading.value = false
   }
-  return DEFAULT_DATA
 }
 
-function save(data: LeetCodeProblem[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-}
-
-const problems = ref<LeetCodeProblem[]>(load())
-
-// ── 目标 ────────────────────────────────────────────────
-function loadGoals(): LeetCodeGoal[] {
-  try {
-    const raw = localStorage.getItem(GOALS_KEY)
-    if (raw) return JSON.parse(raw)
-  } catch { /* ignore */ }
-  return []
-}
-
-function saveGoals(data: LeetCodeGoal[]): void {
-  localStorage.setItem(GOALS_KEY, JSON.stringify(data))
-}
-
-const goals = ref<LeetCodeGoal[]>(loadGoals())
-
-/** 计算某年度目标已完成的题数（有任意一次尝试即计入，每道题只算一次） */
-function calcProgress(goal: LeetCodeGoal): number {
-  const prefix = `${goal.year}.`
-  const seen = new Set<string>()
-  problems.value.forEach((p) => {
-    p.attempts.forEach((a) => {
-      if (a.date.startsWith(prefix)) seen.add(p.id)
-    })
-  })
-  return seen.size
+async function persist(): Promise<void> {
+  await store.set(data.value)
 }
 
 export function useLeetCode() {
-  const list = computed(() => problems.value)
+  const list = computed(() => data.value.problems)
+  const detail = computed(() => data.value.detail)
 
   const stats = computed(() => {
-    const total = problems.value.length
-    const mastered = problems.value.filter((p) => {
+    const total = data.value.problems.length
+    const mastered = data.value.problems.filter((p) => {
       const last = p.attempts[p.attempts.length - 1]
       return last?.passed === true
     }).length
     return { total, mastered, pending: total - mastered }
   })
 
+  async function updateDetail(val: string): Promise<void> {
+    data.value = { ...data.value, detail: val }
+    await persist()
+  }
+
   function add(problem: Omit<LeetCodeProblem, 'id'>): void {
     const id = `lc_${Date.now()}`
-    problems.value = [...problems.value, { ...problem, id }]
-    save(problems.value)
+    data.value = { ...data.value, problems: [...data.value.problems, { ...problem, id }] }
+    persist()
   }
 
   function update(id: string, patch: Partial<Omit<LeetCodeProblem, 'id'>>): void {
-    problems.value = problems.value.map((p) => (p.id === id ? { ...p, ...patch } : p))
-    save(problems.value)
+    data.value = {
+      ...data.value,
+      problems: data.value.problems.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+    }
+    persist()
   }
 
   function remove(id: string): void {
-    problems.value = problems.value.filter((p) => p.id !== id)
-    save(problems.value)
+    data.value = { ...data.value, problems: data.value.problems.filter((p) => p.id !== id) }
+    persist()
   }
 
   // ── 目标 CRUD ──────────────────────────────────────────
-  const goalList = computed(() => goals.value)
+  const goalList = computed(() => data.value.goals)
 
   function goalProgress(goal: LeetCodeGoal) {
-    const done = calcProgress(goal)
+    const prefix = `${goal.year}.`
+    const seen = new Set<string>()
+    data.value.problems.forEach((p) => {
+      p.attempts.forEach((a) => {
+        if (a.date.startsWith(prefix)) seen.add(p.id)
+      })
+    })
+    const done = seen.size
     const pct = goal.target > 0 ? Math.min(100, Math.round((done / goal.target) * 100)) : 0
     return { done, pct }
   }
 
   function addGoal(g: Omit<LeetCodeGoal, 'id'>): void {
-    goals.value = [...goals.value, { ...g, id: `goal_${Date.now()}` }]
-    saveGoals(goals.value)
+    data.value = {
+      ...data.value,
+      goals: [...data.value.goals, { ...g, id: `goal_${Date.now()}` }],
+    }
+    persist()
   }
 
   function updateGoal(id: string, patch: Partial<Omit<LeetCodeGoal, 'id'>>): void {
-    goals.value = goals.value.map((g) => (g.id === id ? { ...g, ...patch } : g))
-    saveGoals(goals.value)
+    data.value = {
+      ...data.value,
+      goals: data.value.goals.map((g) => (g.id === id ? { ...g, ...patch } : g)),
+    }
+    persist()
   }
 
   function removeGoal(id: string): void {
-    goals.value = goals.value.filter((g) => g.id !== id)
-    saveGoals(goals.value)
+    data.value = { ...data.value, goals: data.value.goals.filter((g) => g.id !== id) }
+    persist()
   }
 
-  return { list, stats, add, update, remove, goalList, goalProgress, addGoal, updateGoal, removeGoal }
+  function exportData(): void {
+    const json = JSON.stringify(data.value, null, 2)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `LEETCODE-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  return {
+    list, stats, detail, loading,
+    load, updateDetail, exportData,
+    add, update, remove,
+    goalList, goalProgress, addGoal, updateGoal, removeGoal,
+  }
 }

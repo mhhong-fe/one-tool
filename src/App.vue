@@ -4,11 +4,29 @@ import AppLayout from './components/AppLayout.vue'
 
 const themeOverrides = {
   common: {
-    primaryColor: '#6366f1',
-    primaryColorHover: '#4f46e5',
-    primaryColorPressed: '#4338ca',
-    borderRadius: '10px',
-    borderRadiusSmall: '8px',
+    primaryColor: '#D97757',
+    primaryColorHover: '#C4623E',
+    primaryColorPressed: '#B55530',
+    primaryColorSuppl: '#E8906E',
+    borderRadius: '8px',
+    borderRadiusSmall: '6px',
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    bodyColor: '#F5F0E8',
+    cardColor: '#FFFFFF',
+    modalColor: '#FFFFFF',
+    popoverColor: '#FFFFFF',
+    baseColor: '#FFFFFF',
+  },
+  Button: {
+    colorPrimary: '#1A1A1A',
+    colorHoverPrimary: '#2D2D2D',
+    colorPressedPrimary: '#000000',
+    textColorPrimary: '#FFFFFF',
+    textColorHoverPrimary: '#FFFFFF',
+    textColorPressedPrimary: '#FFFFFF',
+    borderPrimary: '1px solid #1A1A1A',
+    borderHoverPrimary: '1px solid #1A1A1A',
+    borderPressedPrimary: '1px solid #000000',
   },
 }
 </script>

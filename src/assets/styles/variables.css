@@ -1,59 +1,45 @@
-/* ========== C 端风格变量 ========== */
+/* ========== Anthropic-inspired 设计系统 ========== */
 :root {
-  /* 主色（科技蓝紫） */
-  --primary-color: #6366f1;
-  --primary-light: #818cf8;
-  --primary-dark: #4f46e5;
-  --primary-gradient: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%);
-  --primary-soft: rgba(99, 102, 241, 0.12);
-
-  /* 类目色（活泼多彩） */
-  --category-1: #3b82f6;
-  --category-2: #f59e0b;
-  --category-3: #ec4899;
-  --category-4: #8b5cf6;
-  --category-5: #10b981;
+  /* 主色 — Anthropic 橙 */
+  --primary-color: #D97757;
+  --primary-light: #E8906E;
+  --primary-dark: #C4623E;
+  --primary-gradient: linear-gradient(135deg, #E8906E 0%, #D97757 100%);
+  --primary-soft: rgba(217, 119, 87, 0.10);
 
   /* 场景色 */
-  --success-color: #10b981;
-  --warning-color: #f59e0b;
-  --danger-color: #ef4444;
-  --info-color: #3b82f6;
+  --success-color: #2E7D32;
+  --warning-color: #D97000;
+  --danger-color: #C62828;
+  --info-color: #1565C0;
 
-  /* 中性色（偏暖） */
-  --text-primary: #1a1a1a;
+  /* 中性色 — 暖调 */
+  --text-primary: #1A1A1A;
   --text-secondary: #525252;
-  --text-tertiary: #a3a3a3;
-  --bg-primary: #ffffff;
-  --bg-page: #fafaf9;
-  --bg-card: #ffffff;
-  --bg-soft: #f5f5f4;
-  --border-color: #e7e5e4;
-  --border-soft: #f5f5f4;
+  --text-tertiary: #8C8C8C;
+  --bg-primary: #FFFFFF;
+  --bg-page: #F5F0E8;
+  --bg-card: #FFFFFF;
+  --bg-soft: #EDE8E0;
+  --border-color: #D8D1C8;
+  --border-soft: #EDE8E0;
 
-  /* 圆角 */
-  --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 18px;
-  --radius-xl: 24px;
+  /* 圆角 — 克制 */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
 
-  /* 阴影（更柔和） */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-float: 0 12px 40px rgba(0, 0, 0, 0.1);
+  /* 阴影 — 极简 */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.10);
+  --shadow-float: 0 8px 32px rgba(0, 0, 0, 0.12);
 
-  /* 贡献图格子颜色（科技蓝紫风格） */
-  --cell-empty: #ebedf0;
-  --cell-level-1: #c7d2fe;
-  --cell-level-2: #818cf8;
-  --cell-level-3: #6366f1;
-  --cell-level-4: #4f46e5;
-
-  /* 兼容旧变量 */
-  --card-shadow: var(--shadow-md);
-  --card-hover-shadow: var(--shadow-lg);
+  /* 兼容 */
+  --card-shadow: var(--shadow-sm);
+  --card-hover-shadow: var(--shadow-md);
   --bg-secondary: var(--bg-soft);
   --bg-tertiary: var(--bg-soft);
-  --sidebar-bg: linear-gradient(180deg, #fafaf9 0%, #f5f5f4 100%);
+  --sidebar-bg: #FDFAF5;
 }

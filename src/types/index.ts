@@ -1,120 +1,16 @@
-/**
- * 分类/类目类型
- */
-export interface Category {
-  id: string
-  name: string
-  detailLabel: string
-  detailType: 'number' | 'text'
-  icon: string
-  color: string
-  unitsPerScore: number
+export enum DataType {
+  LEETCODE = 'LEETCODE',
+  TECH_GOALS = 'TECH_GOALS',
 }
 
-/**
- * 打卡记录类型
- */
-export interface Record {
-  id: string
-  categoryId: string
-  date: string
-  detail: string
-  remark?: string // 备注字段（可选）
-  createdAt: number
-}
+// ── LeetCode ──────────────────────────────────────────────
 
-/**
- * API 响应数据结构
- */
-export interface ApiConfigResponse {
-  message: string
-  data: {
-    CATEGORIES: Category[]
-    RECORDS: Record[]
-  }
-}
-
-/**
- * 存储键类型
- */
-export type StorageKey = 'CATEGORIES' | 'RECORDS'
-
-/**
- * 存储缓存类型
- */
-export interface StorageCache {
-  CATEGORIES: Category[] | null
-  RECORDS: Record[] | null
-  lastFetchTime: number | null
-}
-
-/**
- * 导入结果类型
- */
-export interface ImportResult {
-  success: boolean
-  error?: string
-}
-
-/**
- * 菜单选项类型
- */
-export interface MenuOption {
-  label: string
-  key: string
-  icon: string
-}
-
-/**
- * 图标选项类型
- */
-export interface IconOption {
-  key: string
-  icon?: string // Iconify 图标名称
-  emoji?: string // 保留 emoji 作为 fallback
-  label: string
-}
-
-/**
- * 日期格子类型（用于热力图）
- */
-export interface DateCell {
-  dateStr: string
-  score: number
-  date: import('dayjs').Dayjs
-  isFuture: boolean
-}
-
-/**
- * 月份分组类型（用于热力图）
- */
-export interface MonthGroup {
-  key: string
-  label: string
-  rows: (DateCell | null)[][]
-}
-
-/**
- * 年度统计类型
- */
-export interface YearStat {
-  month: number
-  total: number
-  score: number
-}
-
-/**
- * LeetCode 单次练习记录
- */
 export interface LeetCodeAttempt {
-  date: string   // "2026.02.11"
+  date: string    // "2026.02.11"
   passed: boolean
   note: string
 }
 
-/**
- * LeetCode 题目
- */
 export interface LeetCodeProblem {
   id: string
   no: number
@@ -122,44 +18,45 @@ export interface LeetCodeProblem {
   attempts: LeetCodeAttempt[]
 }
 
-/**
- * 类目目标
- */
-export interface CategoryGoal {
-  id: string
-  categoryId: string
-  period: 'weekly' | 'monthly' | 'yearly'
-  target: number
-  metric: 'count' | 'sum' // count=打卡次数, sum=累加 detail 数值
-}
-
-/**
- * LeetCode 年度目标
- */
 export interface LeetCodeGoal {
   id: string
   year: number
   target: number
 }
 
-/**
- * 类目统计类型
- */
-export interface CategoryStat {
-  id: string
-  name: string
-  count: number
-  score: number
-  rate: number
-  scoreRate: number
+export interface LeetCodeData {
+  detail: string
+  problems: LeetCodeProblem[]
+  goals: LeetCodeGoal[]
 }
 
-/**
- * 表格行类型（用于统计页面）
- */
-export interface TableRow extends Record {
-  categoryName: string
-  detailLabel: string
-  detailType: 'number' | 'text'
-  score: number
+// ── 技术精进 ───────────────────────────────────────────────
+
+export interface TechArticle {
+  id: string
+  title: string
+  url: string
+  score: number   // 0-10
+  note: string
+}
+
+export interface TechGoal {
+  id: string
+  title: string
+  detail: string
+  maxScore: number
+  articles: TechArticle[]
+}
+
+export interface TechGoalsData {
+  detail: string
+  goals: TechGoal[]
+}
+
+// ── 布局 ───────────────────────────────────────────────────
+
+export interface MenuOption {
+  label: string
+  key: string
+  icon: string
 }
