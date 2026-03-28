@@ -104,6 +104,45 @@ export interface YearStat {
 }
 
 /**
+ * LeetCode 单次练习记录
+ */
+export interface LeetCodeAttempt {
+  date: string   // "2026.02.11"
+  passed: boolean
+  note: string
+}
+
+/**
+ * LeetCode 题目
+ */
+export interface LeetCodeProblem {
+  id: string
+  no: number
+  title: string
+  attempts: LeetCodeAttempt[]
+}
+
+/**
+ * 类目目标
+ */
+export interface CategoryGoal {
+  id: string
+  categoryId: string
+  period: 'weekly' | 'monthly' | 'yearly'
+  target: number
+  metric: 'count' | 'sum' // count=打卡次数, sum=累加 detail 数值
+}
+
+/**
+ * LeetCode 年度目标
+ */
+export interface LeetCodeGoal {
+  id: string
+  year: number
+  target: number
+}
+
+/**
  * 类目统计类型
  */
 export interface CategoryStat {

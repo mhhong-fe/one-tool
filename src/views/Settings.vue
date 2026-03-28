@@ -16,6 +16,7 @@ import {
 } from 'naive-ui'
 import { useCategories } from '../composables/useCategories'
 import { useRecords } from '../composables/useRecords'
+import { useCategoryGoals } from '../composables/useCategoryGoals'
 import { storage } from '../utils/storage'
 import { dayjs } from '../utils/date'
 import IconFont from '../components/IconFont.vue'
@@ -25,6 +26,7 @@ const message = useMessage()
 const dialog = useDialog()
 const { list: categories, add, update, remove, loadCategories } = useCategories()
 const { getByCategoryId, loadRecords } = useRecords()
+const { goalsByCategoryId, addGoal, removeGoal, PERIOD_LABEL } = useCategoryGoals()
 
 const newName = ref('')
 const newDetailLabel = ref('详情')
@@ -37,6 +39,12 @@ const editingDetailLabel = ref('')
 const editingDetailType = ref<'number' | 'text'>('text')
 const editingUnitsPerScore = ref<number>(1)
 const editingIcon = ref<string>('ActivitySource')
+
+// 目标新增表单（每个类目编辑时内联显示）
+const showNewGoalForm = ref(false)
+const newGoalPeriod = ref<'weekly' | 'monthly' | 'yearly'>('monthly')
+const newGoalTarget = ref<number>(0)
+const newGoalMetric = ref<'count' | 'sum'>('count')
 
 onMounted(async () => {
   await loadCategories()
@@ -66,6 +74,21 @@ function startEdit(c: any): void {
   editingDetailType.value = c.detailType || 'text'
   editingUnitsPerScore.value = c.unitsPerScore ?? 1
   editingIcon.value = c.icon || 'ActivitySource'
+  showNewGoalForm.value = false
+  newGoalPeriod.value = 'monthly'
+  newGoalTarget.value = 0
+  newGoalMetric.value = 'count'
+}
+
+function handleAddGoal(): void {
+  if (!editingId.value || !newGoalTarget.value || newGoalTarget.value <= 0) {
+    message.warning('请填写大于 0 的目标值')
+    return
+  }
+  addGoal({ categoryId: editingId.value, period: newGoalPeriod.value, target: newGoalTarget.value, metric: newGoalMetric.value })
+  showNewGoalForm.value = false
+  newGoalTarget.value = 0
+  message.success('目标已添加')
 }
 
 async function saveEdit(): Promise<void> {
@@ -269,6 +292,55 @@ function handleClearData(): void {
               <div class="edit-actions">
                 <NButton size="small" @click="saveEdit">保存</NButton>
                 <NButton size="small" secondary @click="cancelEdit">取消</NButton>
+              </div>
+
+              <!-- 目标管理 -->
+              <div class="goal-section">
+                <div class="goal-section-header">
+                  <span class="goal-section-title">目标设置</span>
+                  <button v-if="!showNewGoalForm" class="btn-add-goal-inline" @click="showNewGoalForm = true">+ 添加</button>
+                </div>
+
+                <!-- 已有目标列表 -->
+                <div v-if="goalsByCategoryId(editingId!).length > 0" class="goal-tag-list">
+                  <div v-for="g in goalsByCategoryId(editingId!)" :key="g.id" class="goal-tag">
+                    <span class="goal-tag-period">{{ PERIOD_LABEL[g.period] }}</span>
+                    <span class="goal-tag-val">{{ g.target }}{{ g.metric === 'count' ? '次' : editingDetailLabel }}</span>
+                    <button class="goal-tag-del" @click="removeGoal(g.id)">×</button>
+                  </div>
+                </div>
+                <p v-else-if="!showNewGoalForm" class="goal-empty-hint">暂无目标</p>
+
+                <!-- 新增目标表单 -->
+                <div v-if="showNewGoalForm" class="goal-new-form">
+                  <div class="goal-form-row">
+                    <div class="goal-form-group">
+                      <span class="goal-form-label">周期</span>
+                      <div class="period-btns">
+                        <button v-for="p in (['weekly','monthly','yearly'] as const)" :key="p"
+                          class="period-btn" :class="{ active: newGoalPeriod === p }"
+                          @click="newGoalPeriod = p">
+                          {{ PERIOD_LABEL[p] }}
+                        </button>
+                      </div>
+                    </div>
+                    <div class="goal-form-group">
+                      <span class="goal-form-label">指标</span>
+                      <div class="period-btns">
+                        <button class="period-btn" :class="{ active: newGoalMetric === 'count' }" @click="newGoalMetric = 'count'">次数</button>
+                        <button class="period-btn" :class="{ active: newGoalMetric === 'sum' }" @click="newGoalMetric = 'sum'">{{ editingDetailLabel }}</button>
+                      </div>
+                    </div>
+                    <div class="goal-form-group">
+                      <span class="goal-form-label">目标值</span>
+                      <NInputNumber v-model:value="newGoalTarget" size="small" :min="1" class="goal-target-input" />
+                    </div>
+                  </div>
+                  <div class="goal-form-actions">
+                    <NButton size="small" type="primary" @click="handleAddGoal">确认</NButton>
+                    <NButton size="small" @click="showNewGoalForm = false">取消</NButton>
+                  </div>
+                </div>
               </div>
             </div>
           </template>
@@ -603,5 +675,126 @@ function handleClearData(): void {
   width: 0;
   height: 0;
   opacity: 0;
+}
+
+/* ── 目标管理 ─────────────────────── */
+.goal-section {
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
+}
+.goal-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.goal-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.btn-add-goal-inline {
+  font-size: 12px;
+  color: var(--primary-color);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+.btn-add-goal-inline:hover {
+  text-decoration: underline;
+}
+.goal-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.goal-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--primary-soft);
+  border-radius: 20px;
+  font-size: 12px;
+}
+.goal-tag-period {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+.goal-tag-val {
+  color: var(--text-secondary);
+}
+.goal-tag-del {
+  color: var(--text-tertiary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+}
+.goal-tag-del:hover {
+  color: var(--error-color, #d03050);
+}
+.goal-empty-hint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin: 0;
+}
+.goal-new-form {
+  background: var(--bg-soft, #f8f8f8);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.goal-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.goal-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.goal-form-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+.period-btns {
+  display: flex;
+  gap: 4px;
+}
+.period-btn {
+  padding: 3px 10px;
+  font-size: 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.period-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+.period-btn.active {
+  background: var(--primary-soft);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+.goal-target-input {
+  width: 100px;
+}
+.goal-form-actions {
+  display: flex;
+  gap: 8px;
 }
 </style>

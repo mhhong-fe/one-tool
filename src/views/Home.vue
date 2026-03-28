@@ -4,6 +4,7 @@ import { NProgress, NTag } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import { useCategories } from '../composables/useCategories'
 import { useRecords } from '../composables/useRecords'
+import { useCategoryGoals } from '../composables/useCategoryGoals'
 import { recordScore } from '../utils/score'
 import { dayjs, todayStr as getTodayStr, weekStart as getWeekStart } from '../utils/date'
 import IconFont from '../components/IconFont.vue'
@@ -64,6 +65,19 @@ const greeting = computed(() => {
   if (h < 18) return '下午好'
   return '晚上好'
 })
+
+const { list: allGoals, calcProgress, PERIOD_LABEL } = useCategoryGoals()
+
+const goalsWithProgress = computed(() => {
+  return allGoals.value.map((g) => {
+    const cat = categories.value.find((c) => c.id === g.categoryId)
+    if (!cat) return null
+    const { done, pct } = calcProgress(g, records.value)
+    const unit = g.metric === 'count' ? '次' : cat.detailLabel
+    const doneStr = g.metric === 'sum' ? (Number.isInteger(done) ? String(done) : done.toFixed(1)) : String(done)
+    return { goal: g, cat, done, doneStr, pct, unit }
+  }).filter(Boolean) as { goal: typeof allGoals.value[0]; cat: typeof categories.value[0]; done: number; doneStr: string; pct: number; unit: string }[]
+})
 </script>
 
 <template>
@@ -113,6 +127,39 @@ const greeting = computed(() => {
       <div class="stat-card" @click="router.push('/stats')">
         <span class="stat-num">{{ todayScore.toFixed(1) }}</span>
         <span class="stat-label">今日得分</span>
+      </div>
+    </section>
+
+    <!-- 目标进度 -->
+    <section v-if="goalsWithProgress.length > 0" class="section-goals">
+      <h2 class="section-title">目标进度</h2>
+      <div class="goals-grid">
+        <div v-for="item in goalsWithProgress" :key="item.goal.id" class="goal-card">
+          <div class="goal-card-top">
+            <div class="goal-cat-info">
+              <IconFont :name="item.cat.icon || 'ActivitySource'" class="goal-cat-icon" :size="18" />
+              <span class="goal-cat-name">{{ item.cat.name }}</span>
+            </div>
+            <span class="goal-period-badge">{{ PERIOD_LABEL[item.goal.period] }}</span>
+          </div>
+          <div class="goal-progress-row">
+            <NProgress
+              type="line"
+              :percentage="item.pct"
+              :color="item.pct >= 100 ? '#3b82f6' : 'var(--primary-color)'"
+              :rail-color="'var(--border-soft)'"
+              :height="6"
+              :border-radius="3"
+              :show-indicator="false"
+            />
+          </div>
+          <div class="goal-card-bottom">
+            <span class="goal-nums">{{ item.doneStr }}<span class="goal-sep">/</span>{{ item.goal.target }}<span class="goal-unit">{{ item.unit }}</span></span>
+            <span class="goal-pct" :class="{ done: item.pct >= 100 }">
+              {{ item.pct >= 100 ? '已达成 🎉' : item.pct + '%' }}
+            </span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -447,5 +494,108 @@ const greeting = computed(() => {
 .btn-primary:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+}
+
+/* ── 目标进度 ──────────────────────── */
+.section-goals {
+  margin-top: 32px;
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.goal-card {
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.2s;
+}
+
+.goal-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-light);
+}
+
+.goal-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.goal-cat-info {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.goal-cat-icon {
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.goal-cat-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.goal-period-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--primary-soft);
+  color: var(--primary-color);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.goal-progress-row {
+  margin: 0;
+}
+
+.goal-card-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.goal-nums {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.goal-sep {
+  margin: 0 2px;
+  color: var(--text-tertiary);
+}
+
+.goal-unit {
+  margin-left: 2px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.goal-pct {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.goal-pct.done {
+  color: #3b82f6;
 }
 </style>

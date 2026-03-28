@@ -14,6 +14,7 @@ const menuOptions = [
   { label: '打卡', key: '/checkin', icon: 'Write' },
   { label: '统计', key: '/stats', icon: 'ChartLine' },
   { label: '设置', key: '/settings', icon: 'Setting' },
+  { label: 'LeetCode', key: '/leetcode', icon: 'Code' },
 ]
 
 function handleMenuSelect(key: string): void {
@@ -24,7 +25,7 @@ const activeKey = computed(() => route.path || '/')
 </script>
 
 <template>
-  <NLayout has-sider class="app-layout" style="height: 100%; width: 100%;">
+  <NLayout has-sider class="app-layout" style="height: 100dvh; width: 100vw;">
     <NLayoutSider
       v-if="isDesktop"
       bordered
@@ -89,8 +90,8 @@ const activeKey = computed(() => route.path || '/')
 
 <style scoped>
 .app-layout {
-  height: 100% !important;
-  width: 100% !important;
+  height: 100dvh !important;
+  width: 100vw !important;
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -101,7 +102,7 @@ const activeKey = computed(() => route.path || '/')
   background: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(12px);
   border-right: 1px solid var(--border-soft);
-  height: 100% !important;
+  height: 100dvh !important;
   flex-shrink: 0;
 }
 
