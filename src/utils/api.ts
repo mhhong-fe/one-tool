@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios'
 import { DataType } from '../types'
 
-const API_BASE_URL = 'https://mhhong.com/api/taskApi/checkin'
+const API_BASE_URL = 'https://mhhong.com/api/taskApi/oneTool'
 
 interface ApiResponse<T> {
   message: string

@@ -241,6 +241,9 @@ function confirmAddArticle(goalId: string) {
           </div>
           <span class="goal-summary-label">{{ goalProgress(goal).pct }}% · {{ goal.articles.length }} 篇</span>
         </div>
+        <div v-if="editingGoalId !== goal.id && goal.detail" class="goal-summary-detail">
+          {{ goal.detail }}
+        </div>
       </div>
     </div>
 
@@ -601,6 +604,13 @@ function confirmAddArticle(goalId: string) {
   font-size: 12px;
   color: var(--text-tertiary);
   flex-shrink: 0;
+}
+
+.goal-summary-detail {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  white-space: pre-wrap;
 }
 
 .add-goal-area {
