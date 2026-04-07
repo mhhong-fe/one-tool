@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick } from "vue";
 import {
     NModal,
     NButton,
@@ -236,6 +236,7 @@ const editingId = ref<string | null>(null);
 const formNo = ref<string>("");
 const formTitle = ref("");
 const formAttempts = ref<LeetCodeAttempt[]>([]);
+const attemptsScrollRef = ref<HTMLElement | null>(null);
 
 function openAdd() {
     editingId.value = null;
@@ -253,8 +254,13 @@ function openEdit(p: LeetCodeProblem) {
     showModal.value = true;
 }
 
-function addAttempt() {
+async function addAttempt() {
     formAttempts.value.push({ date: todayDateStr(), passed: true, note: "" });
+    await nextTick();
+    const container = attemptsScrollRef.value;
+    if (container) {
+        container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+    }
 }
 
 function removeAttempt(idx: number) {
@@ -905,7 +911,7 @@ function handleDeleteGoal() {
                 </div>
 
                 <div class="field-label attempts-label">练习记录</div>
-                <div class="attempts-scroll">
+                <div class="attempts-scroll" ref="attemptsScrollRef">
                     <div
                         v-for="(a, idx) in formAttempts"
                         :key="idx"
