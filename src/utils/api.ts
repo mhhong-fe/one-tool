@@ -4,6 +4,7 @@ import { DataType } from '../types'
 const API_BASE_URL = 'https://mhhong.com/api/taskApi/oneTool'
 
 interface ApiResponse<T> {
+  errNo: number
   message: string
   data: T
 }
@@ -21,7 +22,7 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
   (response: AxiosResponse<ApiResponse<any>>) => {
-    if (response.data?.message !== 'success') {
+    if (response.data?.errNo !== 0) {
       throw new Error(response.data?.message || '请求失败')
     }
     return response.data
