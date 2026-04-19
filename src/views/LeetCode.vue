@@ -328,6 +328,11 @@ function lastNote(p: LeetCodeProblem): string {
     return last?.note || "";
 }
 
+function lastPracticeDate(p: LeetCodeProblem): string {
+    const last = p.attempts[p.attempts.length - 1];
+    return last ? last.date : "";
+}
+
 const weekLabels = ["一", "二", "三", "四", "五", "六", "日"];
 
 // ─── 目标弹窗 ─────────────────────────────────────────────
@@ -611,6 +616,7 @@ function handleDeleteGoal() {
                         <span v-if="lastNote(p)" class="card-note">{{
                             lastNote(p)
                         }}</span>
+                        <span v-if="lastPracticeDate(p)" class="card-last-date">最后练习：{{ lastPracticeDate(p) }}</span>
                         <div v-if="p.attempts.length" class="attempt-track">
                             <span
                                 v-for="(a, i) in p.attempts"
@@ -952,6 +958,8 @@ function handleDeleteGoal() {
                         <NInput
                             v-model:value="a.note"
                             placeholder="笔记（可选）"
+                            type="textarea"
+                            :autosize="{ minRows: 2, maxRows: 6 }"
                             class="input-note"
                         />
                     </div>
@@ -1479,6 +1487,13 @@ function handleDeleteGoal() {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.card-last-date {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 2px;
+    display: block;
 }
 
 /* ── attempt track ─────────────────── */
